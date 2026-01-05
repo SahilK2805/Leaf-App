@@ -24,8 +24,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// API Configuration - Your computer's IP address
-const API_URL = 'http://10.42.138.194:8000';
+// API Configuration - Replace with your Render URL after deployment
+const API_URL = 'https://YOUR_RENDER_URL_HERE.onrender.com';
 const HISTORY_KEY = 'leaf_history_v1';
 
 const { width, height } = Dimensions.get('window');

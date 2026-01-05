@@ -19,9 +19,10 @@
       },
       "package": "com.planthealthcheck.app",
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "plugins": [
@@ -38,7 +39,11 @@
           "cameraPermission": "The app needs access to your camera to take photos of plant leaves."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d0a7b975-3118-441d-bd6b-d4b4b6cb5b4a"
+      }
+    }
   }
 }
-
