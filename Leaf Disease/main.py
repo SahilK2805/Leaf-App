@@ -405,7 +405,15 @@ IMPORTANT: Provide detailed, accurate evaluation for ALL 12 features. This analy
 
             # Extract computer vision features first
             logger.info("Extracting computer vision features...")
-            cv_features = self.image_analyzer.analyze_complete(clean_base64)
+            try:
+                cv_features = self.image_analyzer.analyze_complete(clean_base64)
+                if "error" in cv_features:
+                    logger.warning(f"CV feature extraction had errors: {cv_features.get('error')}")
+                    # Continue with analysis even if CV features fail
+                    cv_features = {}
+            except Exception as cv_error:
+                logger.warning(f"CV feature extraction failed: {str(cv_error)}, continuing with Groq analysis only")
+                cv_features = {}
             
             # Create feature summary for AI prompt
             feature_summary = {}
