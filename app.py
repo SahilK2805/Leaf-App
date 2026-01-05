@@ -34,13 +34,13 @@ async def disease_detection_file(file: UploadFile = File(...)):
         # Convert NumPy types to Python native types for JSON serialization
         def convert_numpy_types(obj):
             """Recursively convert NumPy types to native Python types"""
-            if isinstance(obj, (np.integer, np.int_, np.intc, np.intp, np.int8,
+            if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
                                np.int16, np.int32, np.int64, np.uint8, np.uint16,
                                np.uint32, np.uint64)):
                 return int(obj)
-            elif isinstance(obj, (np.floating, np.float_, np.float16, np.float32, np.float64)):
+            elif isinstance(obj, (np.floating, np.float16, np.float32, np.float64)):
                 return float(obj)
-            elif isinstance(obj, np.bool_):
+            elif isinstance(obj, (np.bool_)):
                 return bool(obj)
             elif isinstance(obj, np.ndarray):
                 return obj.tolist()
