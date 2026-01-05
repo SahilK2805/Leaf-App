@@ -470,11 +470,11 @@ IMPORTANT: Provide detailed, accurate evaluation for ALL 12 features. This analy
             import numpy as np
             def convert_numpy_types(obj):
                 """Recursively convert NumPy types to native Python types"""
-                if isinstance(obj, (np.integer, np.int_, np.intc, np.intp, np.int8,
+                if isinstance(obj, (np.integer, np.intc, np.intp, np.int8,
                                    np.int16, np.int32, np.int64, np.uint8, np.uint16,
                                    np.uint32, np.uint64)):
                     return int(obj)
-                elif isinstance(obj, (np.floating, np.float_, np.float16, np.float32, np.float64)):
+                elif isinstance(obj, (np.floating, np.float16, np.float32, np.float64)):
                     return float(obj)
                 elif isinstance(obj, np.bool_):
                     return bool(obj)
