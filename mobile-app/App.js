@@ -13,6 +13,8 @@ import {
   Dimensions,
   Platform,
   Easing,
+  Linking,
+  Modal,
 } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
@@ -20,9 +22,11 @@ import { Camera } from 'expo-camera';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Configuration - Your computer's IP address
 const API_URL = 'http://10.42.138.194:8000';
+const HISTORY_KEY = 'leaf_history_v1';
 
 const { width, height } = Dimensions.get('window');
 
@@ -31,6 +35,9 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
+  const [productModalVisible, setProductModalVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('home');
+  const [history, setHistory] = useState([]);
   
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -118,6 +125,23 @@ export default function App() {
       }).start();
     }
   }, [result]);
+
+  // Load stored history on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(HISTORY_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            setHistory(parsed);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load history', err);
+      }
+    })();
+  }, []);
 
   // Animate health progress bar
   useEffect(() => {
@@ -251,6 +275,7 @@ export default function App() {
 
       if (response.status === 200) {
         setResult(response.data);
+        await addHistoryEntry(response.data);
       } else {
         throw new Error('Analysis failed');
       }
@@ -271,6 +296,38 @@ export default function App() {
       Alert.alert('Analysis Failed', errorMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const addHistoryEntry = async (analysis) => {
+    try {
+      const entry = {
+        id: Date.now().toString(),
+        timestamp: Date.now(),
+        disease_name: analysis?.disease_name || 'Healthy',
+        severity: analysis?.severity || 'unknown',
+        confidence: Math.round(analysis?.confidence || 0),
+        image,
+      };
+
+      setHistory((prev) => {
+        const updated = [entry, ...prev].slice(0, 50);
+        AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(updated)).catch((err) =>
+          console.warn('Failed to persist history', err)
+        );
+        return updated;
+      });
+    } catch (err) {
+      console.warn('Failed to save history entry', err);
+    }
+  };
+
+  const clearHistory = async () => {
+    try {
+      await AsyncStorage.removeItem(HISTORY_KEY);
+      setHistory([]);
+    } catch (err) {
+      console.warn('Failed to clear history', err);
     }
   };
 
@@ -303,6 +360,28 @@ export default function App() {
     outputRange: [0.3, 0.7, 0.3],
   });
 
+  // Farmer recommendation visibility checks to avoid empty cards
+  const farmer = result?.farmer_recommendations || {};
+  const hasActionData =
+    farmer.action_urgency || farmer.economic_impact || farmer.spread_risk || farmer.estimated_recovery_time;
+  const hasTreatmentSolutions =
+    (farmer.organic_solutions && farmer.organic_solutions.length > 0) ||
+    (farmer.chemical_solutions && farmer.chemical_solutions.length > 0);
+  const hasPreventionData =
+    (farmer.prevention_tips && farmer.prevention_tips.length > 0) || farmer.harvest_recommendation;
+  const hasTreatmentPlaybook =
+    farmer.spray_window || farmer.application_recipe || (farmer.supply_checklist && farmer.supply_checklist.length > 0);
+  const hasSafetyHygiene =
+    (farmer.isolation_sanitation && farmer.isolation_sanitation.length > 0) ||
+    farmer.rescan_reminder ||
+    farmer.harvest_withdrawal;
+  const hasWaterNutrition = !!farmer.water_nutrition;
+  const hasFieldChecklist =
+    (farmer.scouting_checklist && farmer.scouting_checklist.length > 0) || farmer.photo_tip;
+  const hasProductLinks =
+    farmer.product_recommendations && Array.isArray(farmer.product_recommendations) && farmer.product_recommendations.length > 0;
+  const productList = hasProductLinks ? farmer.product_recommendations : [];
+
   return (
     <SafeAreaView style={styles.container}>
       <ExpoStatusBar style="light" />
@@ -316,7 +395,7 @@ export default function App() {
       </View>
 
       <LinearGradient
-        colors={['#1565c0', '#1976d2', '#42a5f5']}
+        colors={['#0f172a', '#1f2937', '#312e81']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.headerGradient}
@@ -335,11 +414,12 @@ export default function App() {
         </Animated.View>
       </LinearGradient>
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+      {activeTab === 'home' && (
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
         {/* Image Selection */}
         <Animated.View
           style={[
@@ -401,7 +481,7 @@ export default function App() {
                 activeOpacity={0.9}
               >
                 <LinearGradient
-                  colors={['#2196f3', '#1976d2', '#1565c0']}
+                  colors={['#8b5cf6', '#7c3aed', '#6d28d9']}
                   style={styles.buttonGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -421,7 +501,7 @@ export default function App() {
                 activeOpacity={0.9}
               >
                 <LinearGradient
-                  colors={['#4caf50', '#388e3c', '#2e7d32']}
+                  colors={['#22d3ee', '#0ea5e9', '#0284c7']}
                   style={styles.buttonGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -444,7 +524,7 @@ export default function App() {
                 activeOpacity={0.9}
               >
                 <LinearGradient
-                  colors={['#1565c0', '#0d47a1', '#0277bd']}
+                  colors={['#f97316', '#fb923c', '#f59e0b']}
                   style={styles.analyzeButtonGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -525,7 +605,7 @@ export default function App() {
             ) : (
               <View style={[styles.statusCard, styles.statusHealthy]}>
                 <LinearGradient
-                  colors={['#e8f5e9', '#c8e6c9', '#ffffff']}
+                  colors={['#0f172a', '#0b1221', '#0f172a']}
                   style={styles.statusCardGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
@@ -540,6 +620,78 @@ export default function App() {
                     Great news! No diseases detected. Your plant appears to be in excellent condition.
                   </Text>
                 </LinearGradient>
+              </View>
+            )}
+
+            {/* Quick Summary Row */}
+            <View style={styles.quickRow}>
+              <LinearGradient
+                colors={['#7c3aed', '#a855f7']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.miniCard}
+              >
+                <View style={[styles.miniIconBadge, { backgroundColor: 'rgba(255,255,255,0.18)' }]}>
+                  <Text style={styles.miniIcon}>🩺</Text>
+                </View>
+                <Text style={styles.miniLabel}>Diagnosis</Text>
+                <Text style={styles.miniValue}>{result.disease_name || 'Healthy'}</Text>
+              </LinearGradient>
+
+              <LinearGradient
+                colors={['#f97316', '#f59e0b']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.miniCard}
+              >
+                <View style={[styles.miniIconBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+                  <Text style={styles.miniIcon}>📈</Text>
+                </View>
+                <Text style={styles.miniLabel}>Severity</Text>
+                <Text style={styles.miniValue}>{(result.severity || 'Unknown').toUpperCase()}</Text>
+              </LinearGradient>
+
+              <LinearGradient
+                colors={['#22c55e', '#10b981']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.miniCard}
+              >
+                <View style={[styles.miniIconBadge, { backgroundColor: 'rgba(255,255,255,0.18)' }]}>
+                  <Text style={styles.miniIcon}>✅</Text>
+                </View>
+                <Text style={styles.miniLabel}>Confidence</Text>
+                <Text style={styles.miniValue}>{Math.round(result.confidence || 0)}%</Text>
+              </LinearGradient>
+            </View>
+
+            {/* Action spotlight */}
+            {result.farmer_recommendations?.action_urgency && (
+              <LinearGradient
+                colors={['#ec4899', '#f472b6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.actionBand}
+              >
+                <Text style={styles.actionBandIcon}>⏰</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.actionBandTitle}>Action Timeline</Text>
+                  <Text style={styles.actionBandText}>{result.farmer_recommendations.action_urgency}</Text>
+                  {result.farmer_recommendations.spread_risk && (
+                    <Text style={styles.actionBandSubtext}>Spread risk: {result.farmer_recommendations.spread_risk}</Text>
+                  )}
+                </View>
+              </LinearGradient>
+            )}
+
+            {/* Quick prevention chips */}
+            {result.farmer_recommendations?.prevention_tips?.length > 0 && (
+              <View style={styles.chipRow}>
+                {result.farmer_recommendations.prevention_tips.slice(0, 3).map((tip, idx) => (
+                  <View key={idx} style={styles.chip}>
+                    <Text style={styles.chipText}>{tip}</Text>
+                  </View>
+                ))}
               </View>
             )}
 
@@ -677,7 +829,7 @@ export default function App() {
             )}
 
             {/* Farmer-Specific Recommendations */}
-            {result.farmer_recommendations && (
+            {farmer && hasActionData && (
               <>
                 {/* Action Urgency & Economic Impact */}
                 <View style={styles.infoCard}>
@@ -718,7 +870,7 @@ export default function App() {
                 </View>
 
                 {/* Treatment Options */}
-                {(result.farmer_recommendations.organic_solutions || result.farmer_recommendations.chemical_solutions) && (
+                {hasTreatmentSolutions && (
                   <View style={styles.infoCard}>
                     <View style={styles.sectionHeader}>
                       <View style={[styles.iconBadge, { backgroundColor: '#4caf50' }]}>
@@ -754,6 +906,7 @@ export default function App() {
                 )}
 
                 {/* Prevention & Harvest */}
+                {hasPreventionData && (
                 <View style={styles.infoCard}>
                   <View style={styles.sectionHeader}>
                     <View style={[styles.iconBadge, { backgroundColor: '#9c27b0' }]}>
@@ -788,7 +941,158 @@ export default function App() {
                     </View>
                   )}
                 </View>
+                )}
               </>
+            )}
+
+            {/* Treatment Playbook */}
+            {farmer && hasTreatmentPlaybook && (
+              <View style={styles.infoCard}>
+                <View style={styles.sectionHeader}>
+                  <View style={[styles.iconBadge, { backgroundColor: '#0288d1' }]}>
+                    <Text style={styles.sectionIcon}>🧴</Text>
+                  </View>
+                  <Text style={styles.sectionTitle}>Treatment Playbook</Text>
+                </View>
+
+                {farmer.spray_window && (
+                  <View style={styles.farmCard}>
+                    <Text style={styles.farmLabel}>🕒 Best Spray Window:</Text>
+                    <Text style={styles.farmValue}>{farmer.spray_window}</Text>
+                  </View>
+                )}
+
+                {farmer.application_recipe && Array.isArray(farmer.application_recipe) && farmer.application_recipe.length > 0 && (
+                  <View style={styles.treatmentSection}>
+                    <Text style={styles.treatmentTitle}>📋 Mix & Apply Steps:</Text>
+                    {farmer.application_recipe.map((step, index) => (
+                      <View key={index} style={styles.listItem}>
+                        <LinearGradient colors={['#0288d1', '#0277bd']} style={styles.numberBadge}>
+                          <Text style={styles.numberText}>{index + 1}</Text>
+                        </LinearGradient>
+                        <View style={styles.treatmentTextContainer}>
+                          <Text style={styles.listText}>{step}</Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {farmer.supply_checklist && Array.isArray(farmer.supply_checklist) && farmer.supply_checklist.length > 0 && (
+                  <View style={styles.treatmentSection}>
+                    <Text style={styles.treatmentTitle}>🧰 Supply Checklist:</Text>
+                    <View style={styles.supplyRow}>
+                      {farmer.supply_checklist.map((item, index) => (
+                        <View key={index} style={styles.supplyChip}>
+                          <Text style={styles.supplyText}>• {item}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Safety & Hygiene */}
+            {farmer && hasSafetyHygiene && (
+              <View style={styles.infoCard}>
+                <View style={styles.sectionHeader}>
+                  <View style={[styles.iconBadge, { backgroundColor: '#c62828' }]}>
+                    <Text style={styles.sectionIcon}>🧤</Text>
+                  </View>
+                  <Text style={styles.sectionTitle}>Safety & Hygiene</Text>
+                </View>
+
+                {farmer.isolation_sanitation && Array.isArray(farmer.isolation_sanitation) && farmer.isolation_sanitation.length > 0 && (
+                  <View style={styles.treatmentSection}>
+                    <Text style={styles.treatmentTitle}>🚧 Isolation & Clean-Up:</Text>
+                    {farmer.isolation_sanitation.map((tip, index) => (
+                      <View key={index} style={styles.listItem}>
+                        <View style={[styles.bulletPoint, { backgroundColor: '#c62828' }]} />
+                        <Text style={styles.listText}>{tip}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {farmer.harvest_withdrawal && (
+                  <View style={styles.farmCard}>
+                    <Text style={styles.farmLabel}>⏳ Harvest Wait:</Text>
+                    <Text style={styles.farmValue}>{farmer.harvest_withdrawal}</Text>
+                  </View>
+                )}
+
+                {farmer.rescan_reminder && (
+                  <View style={styles.farmCard}>
+                    <Text style={styles.farmLabel}>🔄 When to Rescan:</Text>
+                    <Text style={styles.farmValue}>{farmer.rescan_reminder}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Water & Nutrition */}
+            {farmer && hasWaterNutrition && (
+              <View style={styles.infoCard}>
+                <View style={styles.sectionHeader}>
+                  <View style={[styles.iconBadge, { backgroundColor: '#2e7d32' }]}>
+                    <Text style={styles.sectionIcon}>💧</Text>
+                  </View>
+                  <Text style={styles.sectionTitle}>Water & Nutrition</Text>
+                </View>
+                <View style={styles.farmCard}>
+                  <Text style={styles.farmLabel}>💦 Irrigation & Feeding:</Text>
+                  <Text style={styles.farmValue}>{farmer.water_nutrition}</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Field Checklist */}
+            {farmer && hasFieldChecklist && (
+              <View style={styles.infoCard}>
+                <View style={styles.sectionHeader}>
+                  <View style={[styles.iconBadge, { backgroundColor: '#6a1b9a' }]}>
+                    <Text style={styles.sectionIcon}>📋</Text>
+                  </View>
+                  <Text style={styles.sectionTitle}>Field Checklist</Text>
+                </View>
+
+                {farmer.scouting_checklist && Array.isArray(farmer.scouting_checklist) && farmer.scouting_checklist.length > 0 && (
+                  <View style={styles.treatmentSection}>
+                    <Text style={styles.treatmentTitle}>👀 Watch This Week:</Text>
+                    {farmer.scouting_checklist.map((tip, index) => (
+                      <View key={index} style={styles.listItem}>
+                        <View style={[styles.bulletPoint, { backgroundColor: '#6a1b9a' }]} />
+                        <Text style={styles.listText}>{tip}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {farmer.photo_tip && (
+                  <View style={styles.farmCard}>
+                    <Text style={styles.farmLabel}>📸 Photo Tip:</Text>
+                    <Text style={styles.farmValue}>{farmer.photo_tip}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Recommended Products */}
+            {farmer && hasProductLinks && (
+              <TouchableOpacity activeOpacity={0.9} onPress={() => setProductModalVisible(true)}>
+                <View style={styles.infoCard}>
+                  <View style={styles.sectionHeader}>
+                    <View style={[styles.iconBadge, { backgroundColor: '#ffb300' }]}>
+                      <Text style={styles.sectionIcon}>🛒</Text>
+                    </View>
+                    <Text style={styles.sectionTitle}>Recommended Products</Text>
+                  </View>
+                  <Text style={styles.listText}>
+                    Tap to view {productList.length} recommended items from Amazon/Flipkart.
+                  </Text>
+                </View>
+              </TouchableOpacity>
             )}
 
             {/* Advanced Features */}
@@ -930,7 +1234,120 @@ export default function App() {
             </LinearGradient>
           </Animated.View>
         )}
-      </ScrollView>
+        </ScrollView>
+      )}
+
+      {activeTab === 'history' && (
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.historyContent}
+        >
+          <View style={styles.historyHeader}>
+            <View>
+              <Text style={styles.historyTitle}>Analysis History</Text>
+              <Text style={styles.historySubtitle}>Previous uploads and results</Text>
+            </View>
+            {history.length > 0 && (
+              <TouchableOpacity style={styles.clearButton} onPress={clearHistory}>
+                <Text style={styles.clearButtonText}>Clear</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {history.length === 0 && (
+            <View style={styles.historyEmpty}>
+              <Text style={styles.historyEmptyIcon}>🕒</Text>
+              <Text style={styles.historyEmptyTitle}>No history yet</Text>
+              <Text style={styles.historyEmptyText}>Run an analysis to see it saved here.</Text>
+            </View>
+          )}
+
+          {history.map((item) => (
+            <View key={item.id} style={styles.historyCard}>
+              <View style={styles.historyRow}>
+                <View style={styles.historyTextWrap}>
+                  <Text style={styles.historyDisease}>{item.disease_name}</Text>
+                  <Text style={styles.historyMeta}>
+                    {item.severity?.toUpperCase()} • {item.confidence}% • {new Date(item.timestamp).toLocaleString()}
+                  </Text>
+                </View>
+                <View style={[styles.historyBadge, { backgroundColor: getStatusColor(item.severity) }]}>
+                  <Text style={styles.historyBadgeText}>{getStatusIcon(item.severity)}</Text>
+                </View>
+              </View>
+              {item.image && (
+                <Image source={{ uri: item.image }} style={styles.historyImage} />
+              )}
+            </View>
+          ))}
+        </ScrollView>
+      )}
+
+      <View style={styles.bottomTabBar}>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'home' && styles.tabItemActive]}
+          onPress={() => setActiveTab('home')}
+        >
+          <Text style={[styles.tabIcon, activeTab === 'home' && styles.tabIconActive]}>🏠</Text>
+          <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabItem, activeTab === 'history' && styles.tabItemActive]}
+          onPress={() => setActiveTab('history')}
+        >
+          <Text style={[styles.tabIcon, activeTab === 'history' && styles.tabIconActive]}>🕓</Text>
+          <Text style={[styles.tabLabel, activeTab === 'history' && styles.tabLabelActive]}>History</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Product Recommendations Modal */}
+      <Modal
+        animationType="slide"
+        transparent
+        visible={productModalVisible}
+        onRequestClose={() => setProductModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Recommended Products</Text>
+              <TouchableOpacity onPress={() => setProductModalVisible(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {productList.map((product, index) => (
+                <View key={index} style={styles.productCard}>
+                  <View style={styles.productHeader}>
+                    <Text style={styles.productName}>{product.product_name || 'Product'}</Text>
+                    {product.store && (
+                      <View style={styles.storePill}>
+                        <Text style={styles.storePillText}>{product.store}</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {product.usage_note && <Text style={styles.productNote}>{product.usage_note}</Text>}
+                  {product.price_hint && <Text style={styles.productPrice}>{product.price_hint}</Text>}
+
+                  {product.url && (
+                    <TouchableOpacity
+                      style={styles.productButton}
+                      onPress={() => Linking.openURL(product.url)}
+                    >
+                      <LinearGradient colors={['#ffb300', '#ff9800']} style={styles.productButtonGradient}>
+                        <Text style={styles.productButtonText}>Open Link</Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -938,7 +1355,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a1128',
+    backgroundColor: '#050712',
   },
   backgroundDecor: {
     ...StyleSheet.absoluteFillObject,
@@ -953,27 +1370,27 @@ const styles = StyleSheet.create({
     height: width * 1.2,
     top: -width * 0.6,
     left: -width * 0.3,
-    backgroundColor: 'rgba(33, 150, 243, 0.15)',
+    backgroundColor: 'rgba(124, 58, 237, 0.22)',
   },
   decorCircleRight: {
     width: width * 0.8,
     height: width * 0.8,
     top: height * 0.25,
     right: -width * 0.3,
-    backgroundColor: 'rgba(76, 175, 80, 0.12)',
+    backgroundColor: 'rgba(34, 197, 94, 0.16)',
   },
   decorCircleBottom: {
     width: width * 1.1,
     height: width * 1.1,
     bottom: -width * 0.7,
     left: -width * 0.2,
-    backgroundColor: 'rgba(156, 39, 176, 0.1)',
+    backgroundColor: 'rgba(14, 165, 233, 0.15)',
   },
   headerGradient: {
     paddingTop: Platform.OS === 'ios' ? 0 : 20,
     paddingBottom: 32,
     paddingHorizontal: 24,
-    shadowColor: '#2196f3',
+    shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 20,
@@ -1006,7 +1423,164 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 50,
+    paddingBottom: 140,
+  },
+  historyContent: {
+    padding: 24,
+    paddingBottom: 120,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  historyTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#e5e7eb',
+  },
+  historySubtitle: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginTop: 4,
+  },
+  clearButton: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  clearButtonText: {
+    color: '#e5e7eb',
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+  historyCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  historyRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  historyTextWrap: {
+    flex: 1,
+    marginRight: 12,
+  },
+  historyDisease: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#f3f4f6',
+  },
+  historyMeta: {
+    fontSize: 13,
+    color: '#d1d5db',
+    marginTop: 4,
+  },
+  historyBadge: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  historyBadgeText: {
+    color: '#fff',
+    fontSize: 22,
+  },
+  historyImage: {
+    width: '100%',
+    height: 140,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  historyEmpty: {
+    alignItems: 'center',
+    padding: 32,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  historyEmptyIcon: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  historyEmptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#e5e7eb',
+  },
+  historyEmptyText: {
+    fontSize: 14,
+    color: '#cbd5e1',
+    marginTop: 4,
+  },
+  bottomTabBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(12, 17, 34, 0.9)',
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.08)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderRadius: 14,
+    flexDirection: 'row',
+    gap: 6,
+  },
+  tabItemActive: {
+    backgroundColor: 'rgba(124, 58, 237, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(124, 58, 237, 0.35)',
+  },
+  tabIcon: {
+    fontSize: 18,
+    color: '#9ca3af',
+  },
+  tabIconActive: {
+    color: '#c4b5fd',
+  },
+  tabLabel: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#9ca3af',
+    letterSpacing: 0.4,
+  },
+  tabLabelActive: {
+    color: '#e5e7eb',
   },
   imageSection: {
     padding: 24,
@@ -1017,7 +1591,7 @@ const styles = StyleSheet.create({
   imageWrapper: {
     borderRadius: 28,
     overflow: 'hidden',
-    shadowColor: '#2196f3',
+    shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.35,
     shadowRadius: 24,
@@ -1038,14 +1612,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 360,
     borderRadius: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 18,
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     borderStyle: 'dashed',
-    shadowColor: '#2196f3',
+    shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
@@ -1108,7 +1682,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 20,
     overflow: 'hidden',
-    shadowColor: '#2196f3',
+    shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -1145,7 +1719,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: '#1565c0',
+    shadowColor: '#f59e0b',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 20,
@@ -1209,7 +1783,7 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   statusHealthy: {
-    borderColor: '#4caf50',
+    borderColor: '#10b981',
   },
   statusCardGradient: {
     padding: 32,
@@ -1230,15 +1804,114 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   statusTitleHealthy: {
-    color: '#2e7d32',
+    color: '#a7f3d0',
   },
   healthyMessage: {
     fontSize: 16,
-    color: '#555',
+    color: '#e5e7eb',
     textAlign: 'center',
     lineHeight: 24,
     marginTop: 8,
     fontWeight: '500',
+  },
+  quickRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    marginTop: 6,
+  },
+  miniCard: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  miniIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  miniIcon: {
+    fontSize: 20,
+  },
+  miniLabel: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  miniValue: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '900',
+    marginTop: 4,
+    letterSpacing: 0.6,
+  },
+  actionBand: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 18,
+    shadowColor: '#ff7043',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 8,
+    marginBottom: 16,
+  },
+  actionBandIcon: {
+    fontSize: 28,
+    marginRight: 12,
+    color: '#fff',
+  },
+  actionBandTitle: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+  },
+  actionBandText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '900',
+    marginTop: 2,
+  },
+  actionBandSubtext: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    marginTop: 2,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginHorizontal: 20,
+    marginBottom: 18,
+  },
+  chip: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
+  chipText: {
+    color: '#fff',
+    fontWeight: '700',
+    letterSpacing: 0.4,
   },
   badgeContainer: {
     flexDirection: 'row',
@@ -1593,5 +2266,133 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: '600',
     letterSpacing: 0.2,
+  },
+  supplyRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  supplyChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 16,
+    backgroundColor: 'rgba(2, 136, 209, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(2, 136, 209, 0.25)',
+    shadowColor: '#0288d1',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  supplyText: {
+    fontSize: 14,
+    color: '#0d47a1',
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+  productCard: {
+    backgroundColor: 'rgba(255, 248, 225, 0.8)',
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 179, 0, 0.3)',
+    shadowColor: '#ffb300',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  productHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  productName: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#4e342e',
+    flex: 1,
+    marginRight: 10,
+    letterSpacing: 0.4,
+  },
+  storePill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.08)',
+  },
+  storePillText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#ff9800',
+    letterSpacing: 0.5,
+  },
+  productNote: {
+    fontSize: 15,
+    color: '#5d4037',
+    marginBottom: 6,
+    fontWeight: '600',
+    lineHeight: 22,
+  },
+  productPrice: {
+    fontSize: 14,
+    color: '#8d6e63',
+    marginBottom: 10,
+    fontWeight: '700',
+  },
+  productButton: {
+    alignSelf: 'flex-start',
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  productButtonGradient: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 14,
+  },
+  productButtonText: {
+    color: '#fff',
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    maxHeight: height * 0.7,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#333',
+  },
+  modalClose: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#555',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
 });

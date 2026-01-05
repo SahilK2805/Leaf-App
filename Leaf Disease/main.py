@@ -271,7 +271,25 @@ For VALID LEAF images, return this COMPREHENSIVE format:
         "chemical_solutions": ["chemical treatment option 1 with recommended dosage", "option 2"],
         "estimated_recovery_time": "2-3 weeks with treatment / 4-6 weeks / Disease is severe, may not recover",
         "spread_risk": "High - isolate immediately / Moderate - monitor nearby plants / Low - contained",
-        "harvest_recommendation": "Safe to harvest / Wait 2-3 weeks after treatment / Do not harvest - contaminated"
+        "harvest_recommendation": "Safe to harvest / Wait 2-3 weeks after treatment / Do not harvest - contaminated",
+        "spray_window": "Best time to spray (early morning/evening), avoid rain or strong wind",
+        "application_recipe": ["step 1 mix instructions", "step 2 application pattern", "step 3 aftercare"],
+        "supply_checklist": ["gloves", "mask", "clean sprayer", "measuring cup", "soap/bleach for cleanup"],
+        "isolation_sanitation": ["isolate sick plants", "sanitize tools before/after", "avoid walking from sick to healthy rows"],
+        "water_nutrition": "Irrigation and fertilization guidance that fits this disease/severity",
+        "scouting_checklist": ["what to re-check over the next 7 days", "leaves/branches/soil cues to watch"],
+        "rescan_reminder": "When to take the next photo to verify recovery",
+        "harvest_withdrawal": "Waiting period before harvest after any chemical spray",
+        "photo_tip": "How to take a clearer leaf photo next time for better AI analysis",
+        "product_recommendations": [
+            {{
+                "product_name": "Product name farmers can buy",
+                "store": "Amazon or Flipkart",
+                "url": "https://... (use a real, currently available product link from Amazon.in or Flipkart)",
+                "price_hint": "INR price range if known",
+                "usage_note": "How/when to use it for this disease"
+            }}
+        ]
     }},
     "feature_evaluation": {{
         "1_leaf_color": {{
@@ -578,7 +596,8 @@ IMPORTANT: Provide detailed, accurate evaluation for ALL 12 features. This analy
                 symptoms=disease_data.get('symptoms', []),
                 possible_causes=disease_data.get('possible_causes', []),
                 treatment=disease_data.get('treatment', []),
-                feature_analysis=feature_analysis
+                feature_analysis=feature_analysis,
+                farmer_recommendations=disease_data.get('farmer_recommendations', {})
             )
 
         except json.JSONDecodeError:
