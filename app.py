@@ -22,9 +22,11 @@ async def disease_detection_file(file: UploadFile = File(...)):
         
         # Read uploaded file into memory
         contents = await file.read()
+        logger.info(f"Read {len(contents)} bytes from uploaded file")
         
     # Process file directly from memory
         result = convert_image_to_base64_and_test(contents)
+        logger.info(f"Image processing completed. Result type: {type(result)}")
         
     # No cleanup needed since file is not saved locally
         
@@ -66,7 +68,9 @@ async def disease_detection_file(file: UploadFile = File(...)):
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
         logger.error(f"Error in disease detection (file): {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 

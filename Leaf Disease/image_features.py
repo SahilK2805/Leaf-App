@@ -662,20 +662,35 @@ class LeafImageAnalyzer:
         Returns:
             Dictionary containing all extracted features
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         try:
             # Convert base64 to image
+            logger.info("Converting base64 to image...")
             img = self.base64_to_image(base64_image)
+            logger.info(f"Image converted successfully. Shape: {img.shape}")
             
             # Extract all features
+            logger.info("Extracting color features...")
             color_features = self.extract_leaf_color_features(img)
+            logger.info("Extracting color uniformity...")
             color_uniformity = self.extract_color_uniformity(img)
+            logger.info("Extracting texture features...")
             texture_features = self.extract_texture_features(img)
+            logger.info("Extracting spots/lesions...")
             spots_lesions = self.extract_spots_lesions(img)
+            logger.info("Extracting shape deformation...")
             shape_deformation = self.extract_shape_deformation(img)
+            logger.info("Extracting edge condition...")
             edge_condition = self.extract_edge_condition(img)
+            logger.info("Extracting size/area...")
             size_area = self.extract_size_area(img)
+            logger.info("Extracting vein visibility...")
             vein_visibility = self.extract_vein_visibility(img)
+            logger.info("Extracting glossiness...")
             glossiness = self.extract_glossiness(img)
+            logger.info("Calculating chlorophyll index...")
             chlorophyll_index = self.calculate_chlorophyll_index(img)
             
             # Combine features for stress calculation
