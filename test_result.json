@@ -1,0 +1,308 @@
+{
+  "disease_detected": true,
+  "disease_name": "Leaf Spot Disease",
+  "disease_type": "fungal",
+  "severity": "moderate",
+  "confidence": 85.0,
+  "symptoms": [
+    "brown spots with yellow margins",
+    "leaf discoloration"
+  ],
+  "possible_causes": [
+    "fungal infection",
+    "bacterial infection",
+    "environmental stress"
+  ],
+  "treatment": [
+    "fungicides",
+    "bactericides",
+    "improve air circulation",
+    "remove infected leaves"
+  ],
+  "analysis_timestamp": "2026-01-03T13:26:07.964393+05:30",
+  "feature_analysis": {
+    "ai_evaluation": {
+      "1_leaf_color": {
+        "green_intensity": "moderate",
+        "yellowing_detected": false,
+        "pale_detected": false,
+        "dark_green_detected": false,
+        "assessment": "Healthy Green",
+        "nutrient_indicators": []
+      },
+      "2_color_uniformity": {
+        "is_uniform": false,
+        "patchiness_detected": true,
+        "assessment": "Patchy (Stress/Deficiency/Disease)"
+      },
+      "3_leaf_texture": {
+        "texture_type": "rough",
+        "abnormalities_detected": true,
+        "assessment": "Rough/Spotted (Disease or Stress)"
+      },
+      "4_spots_lesions_discoloration": {
+        "brown_spots": true,
+        "white_patches": false,
+        "black_lesions": false,
+        "yellow_margins": false,
+        "severity": "moderate",
+        "assessment": "Moderate Lesions/Discoloration"
+      },
+      "5_leaf_shape_deformation": {
+        "deformation_detected": false,
+        "deformation_type": "none",
+        "assessment": "Normal Shape"
+      },
+      "6_leaf_edge_condition": {
+        "burnt_edges": false,
+        "yellow_edges": false,
+        "dry_margins": false,
+        "assessment": "Healthy Edges"
+      },
+      "7_leaf_size_area": {
+        "size_assessment": "normal",
+        "stunted_growth": false,
+        "assessment": "Normal/Large Size"
+      },
+      "8_vein_color_visibility": {
+        "vein_visibility": "normal",
+        "green_veins_yellow_surface": false,
+        "iron_deficiency_indicator": false,
+        "assessment": "Normal Vein Visibility"
+      },
+      "9_glossiness_dullness": {
+        "surface_quality": "dull",
+        "assessment": "Dull/Dusty (Stress or Aging)"
+      },
+      "10_stress_indicators": {
+        "health_status": "\ud83d\udfe1 Mild Stress",
+        "stress_level": "moderate",
+        "overall_assessment": "Mild Stress"
+      },
+      "11_chlorophyll_index": {
+        "chlorophyll_level": "moderate",
+        "nitrogen_level_estimate": "moderate",
+        "assessment": "Moderate (No Nitrogen Deficiency)"
+      },
+      "12_ph_proxy": {
+        "ph_estimate": "Normal pH",
+        "confidence": "Low (Indirect Estimation)",
+        "indicators": [
+          "color changes",
+          "stress patterns"
+        ]
+      }
+    },
+    "computer_vision_analysis": {
+      "1_leaf_color": {
+        "green_intensity": 158.8877747655334,
+        "green_ratio": 0.7467963655043639,
+        "yellowing_percentage": 9.319863716295428,
+        "pale_percentage": 0.03150644783118405,
+        "dark_green_percentage": 0.31030187573270807,
+        "color_status": "Healthy Green",
+        "assessment": "Healthy"
+      },
+      "2_color_uniformity": {
+        "color_variation_coefficient": 17.021890375789066,
+        "patchiness_percentage": 10.0,
+        "uniformity_status": "Moderately Uniform",
+        "is_uniform": "True"
+      },
+      "3_leaf_texture": {
+        "contrast": 36.275444337850764,
+        "entropy": 6.683016777038574,
+        "edge_density": 7.7478385111371635,
+        "roughness_percentage": 9.913357268464244,
+        "texture_status": "Moderate Texture",
+        "is_smooth": "False"
+      },
+      "4_spots_lesions_discoloration": {
+        "brown_spots_percentage": 3.800373681125439,
+        "white_patches_percentage": 0.0012822391559202814,
+        "black_lesions_percentage": 0.005495310668229778,
+        "yellow_margins_percentage": 7.873681125439624,
+        "total_abnormality_percentage": 3.807151230949589,
+        "lesion_status": "Mild Lesions/Discoloration",
+        "has_lesions": "True"
+      },
+      "5_leaf_shape_deformation": {
+        "shape_status": "Deformed (Curling/Folding/Shrinking Detected)",
+        "deformation_detected": true,
+        "curvature_index": 714.0,
+        "compactness": 0.017188402586523,
+        "defect_count": 7
+      },
+      "6_leaf_edge_condition": {
+        "burnt_edges_percentage": 212.46279761904762,
+        "yellow_edges_percentage": 6.500114468864469,
+        "dry_margins_percentage": 0.0,
+        "edge_status": "Burnt Edges (Possible Potassium Deficiency)",
+        "edge_issues_detected": "True"
+      },
+      "7_leaf_size_area": {
+        "leaf_area_pixels": 202666.5,
+        "leaf_area_percentage": 37.123845984759676,
+        "relative_size": "Moderate",
+        "size_status": "Moderate Size",
+        "is_stunted": false
+      },
+      "8_vein_color_visibility": {
+        "vein_density_percentage": 14.670281359906213,
+        "green_vein_percentage": 20.91387016412661,
+        "yellow_surface_percentage": 7.873681125439624,
+        "vein_status": "Normal Vein Visibility",
+        "prominent_veins": "True",
+        "iron_deficiency_indicator": "False"
+      },
+      "9_glossiness_dullness": {
+        "brightness_variation": 25.93985641964151,
+        "glossiness_percentage": 25.0,
+        "glossiness_status": "Moderate Glossiness",
+        "is_glossy": "False"
+      },
+      "10_stress_indicators": {
+        "stress_score": 0.7,
+        "stress_factors_count": 7,
+        "health_status": "\ud83d\udd34 Severe Stress",
+        "overall_assessment": "\ud83d\udd34 Severe Stress"
+      },
+      "11_chlorophyll_index": {
+        "chlorophyll_index": 0.6230893128060133,
+        "green_ratio": 0.42867687722041886,
+        "chlorophyll_status": "High (Good Nitrogen Level)",
+        "estimated_nitrogen_level": "High"
+      },
+      "12_ph_proxy": {
+        "ph_estimate": "Normal pH",
+        "low_ph_indicators": 0,
+        "high_ph_indicators": 1,
+        "confidence": "Low (Indirect Estimation)"
+      }
+    },
+    "combined_analysis": {
+      "1_leaf_color": {
+        "green_intensity": 158.8877747655334,
+        "yellowing_detected": false,
+        "pale_detected": false,
+        "dark_green_detected": false,
+        "assessment": "Healthy",
+        "nutrient_indicators": [],
+        "green_ratio": 0.7467963655043639,
+        "yellowing_percentage": 9.319863716295428,
+        "pale_percentage": 0.03150644783118405,
+        "dark_green_percentage": 0.31030187573270807,
+        "color_status": "Healthy Green"
+      },
+      "2_color_uniformity": {
+        "is_uniform": "True",
+        "patchiness_detected": true,
+        "assessment": "Patchy (Stress/Deficiency/Disease)",
+        "color_variation_coefficient": 17.021890375789066,
+        "patchiness_percentage": 10.0,
+        "uniformity_status": "Moderately Uniform"
+      },
+      "3_leaf_texture": {
+        "texture_type": "rough",
+        "abnormalities_detected": true,
+        "assessment": "Rough/Spotted (Disease or Stress)",
+        "contrast": 36.275444337850764,
+        "entropy": 6.683016777038574,
+        "edge_density": 7.7478385111371635,
+        "roughness_percentage": 9.913357268464244,
+        "texture_status": "Moderate Texture",
+        "is_smooth": "False"
+      },
+      "4_spots_lesions_discoloration": {
+        "brown_spots": true,
+        "white_patches": false,
+        "black_lesions": false,
+        "yellow_margins": false,
+        "severity": "moderate",
+        "assessment": "Moderate Lesions/Discoloration",
+        "brown_spots_percentage": 3.800373681125439,
+        "white_patches_percentage": 0.0012822391559202814,
+        "black_lesions_percentage": 0.005495310668229778,
+        "yellow_margins_percentage": 7.873681125439624,
+        "total_abnormality_percentage": 3.807151230949589,
+        "lesion_status": "Mild Lesions/Discoloration",
+        "has_lesions": "True"
+      },
+      "5_leaf_shape_deformation": {
+        "deformation_detected": true,
+        "deformation_type": "none",
+        "assessment": "Normal Shape",
+        "shape_status": "Deformed (Curling/Folding/Shrinking Detected)",
+        "curvature_index": 714.0,
+        "compactness": 0.017188402586523,
+        "defect_count": 7
+      },
+      "6_leaf_edge_condition": {
+        "burnt_edges": false,
+        "yellow_edges": false,
+        "dry_margins": false,
+        "assessment": "Healthy Edges",
+        "burnt_edges_percentage": 212.46279761904762,
+        "yellow_edges_percentage": 6.500114468864469,
+        "dry_margins_percentage": 0.0,
+        "edge_status": "Burnt Edges (Possible Potassium Deficiency)",
+        "edge_issues_detected": "True"
+      },
+      "7_leaf_size_area": {
+        "size_assessment": "normal",
+        "stunted_growth": false,
+        "assessment": "Normal/Large Size",
+        "leaf_area_pixels": 202666.5,
+        "leaf_area_percentage": 37.123845984759676,
+        "relative_size": "Moderate",
+        "size_status": "Moderate Size",
+        "is_stunted": false
+      },
+      "8_vein_color_visibility": {
+        "vein_visibility": "normal",
+        "green_veins_yellow_surface": false,
+        "iron_deficiency_indicator": "False",
+        "assessment": "Normal Vein Visibility",
+        "vein_density_percentage": 14.670281359906213,
+        "green_vein_percentage": 20.91387016412661,
+        "yellow_surface_percentage": 7.873681125439624,
+        "vein_status": "Normal Vein Visibility",
+        "prominent_veins": "True"
+      },
+      "9_glossiness_dullness": {
+        "surface_quality": "dull",
+        "assessment": "Dull/Dusty (Stress or Aging)",
+        "brightness_variation": 25.93985641964151,
+        "glossiness_percentage": 25.0,
+        "glossiness_status": "Moderate Glossiness",
+        "is_glossy": "False"
+      },
+      "10_stress_indicators": {
+        "health_status": "\ud83d\udd34 Severe Stress",
+        "stress_level": "moderate",
+        "overall_assessment": "\ud83d\udd34 Severe Stress",
+        "stress_score": 0.7,
+        "stress_factors_count": 7
+      },
+      "11_chlorophyll_index": {
+        "chlorophyll_level": "moderate",
+        "nitrogen_level_estimate": "moderate",
+        "assessment": "Moderate (No Nitrogen Deficiency)",
+        "chlorophyll_index": 0.6230893128060133,
+        "green_ratio": 0.42867687722041886,
+        "chlorophyll_status": "High (Good Nitrogen Level)",
+        "estimated_nitrogen_level": "High"
+      },
+      "12_ph_proxy": {
+        "ph_estimate": "Normal pH",
+        "confidence": "Low (Indirect Estimation)",
+        "indicators": [
+          "color changes",
+          "stress patterns"
+        ],
+        "low_ph_indicators": 0,
+        "high_ph_indicators": 1
+      }
+    }
+  }
+}
