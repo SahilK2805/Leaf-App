@@ -286,7 +286,7 @@ export default function App() {
       if (error.code === 'ECONNABORTED') {
         errorMessage += 'Request timeout. The server took too long to respond.';
       } else if (error.message === 'Network Error') {
-        errorMessage += `Network error. Make sure:\n1. Backend server is running on ${API_URL}\n2. Your device and computer are on the same WiFi network\n3. Firewall allows port 8000`;
+        errorMessage += `Network error. Make sure:\n1. Backend server is running on ${API_URL}\n2. Your phone has internet access\n3. Try disabling VPN if enabled`;
       } else if (error.response) {
         errorMessage += error.response.data?.detail || `Server error: ${error.response.status}`;
       } else {
