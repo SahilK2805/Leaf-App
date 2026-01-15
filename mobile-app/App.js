@@ -24,8 +24,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// API Configuration - Cloud backend on Render
-const API_URL = 'https://leaf-disease-backend-ye1h.onrender.com';
+// API Configuration - Local development
+const API_URL = 'http://10.128.199.194:8000';
 const HISTORY_KEY = 'leaf_history_v1';
 
 const { width, height } = Dimensions.get('window');
