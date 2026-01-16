@@ -25,10 +25,370 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Configuration - Local development
-const API_URL = 'http://10.128.199.194:8000';
+// Using local machine IP for network access
+const API_URL = 'http://10.161.207.194:8000';
 const HISTORY_KEY = 'leaf_history_v1';
+const LANGUAGE_KEY = 'app_language';
 
 const { width, height } = Dimensions.get('window');
+
+// Translations
+const translations = {
+  en: {
+    appTitle: 'Plant Health Check',
+    appSubtitle: 'AI-Powered Plant Disease Detection',
+    gallery: 'Gallery',
+    camera: 'Camera',
+    checkPlantHealth: 'Check Plant Health',
+    tapToAnalyze: 'Tap to analyze',
+    home: 'Home',
+    history: 'History',
+    analyzing: 'Analyzing...',
+    pleaseWait: 'Please wait while we analyze your plant...',
+    analysisFailed: 'Analysis Failed',
+    diseaseDetected: 'Disease Detected',
+    healthyPlant: 'Healthy Plant!',
+    severity: 'Severity',
+    confidence: 'Confidence',
+    symptoms: 'Symptoms',
+    possibleCauses: 'Possible Causes',
+    treatment: 'Treatment',
+    recommendations: 'Recommendations',
+    actionTimeline: 'Action Timeline',
+    treatmentSolutions: 'Treatment Solutions',
+    preventionTips: 'Prevention Tips',
+    treatmentPlaybook: 'Treatment Playbook',
+    safetyHygiene: 'Safety & Hygiene',
+    waterNutrition: 'Water & Nutrition',
+    fieldChecklist: 'Field Checklist',
+    viewProducts: 'View Product Recommendations',
+    productRecommendations: 'Product Recommendations',
+    close: 'Close',
+    buyNow: 'Buy Now',
+    clearHistory: 'Clear History',
+    confirmClear: 'Are you sure you want to clear all history?',
+    cancel: 'Cancel',
+    noHistory: 'No Analysis History',
+    noHistoryDesc: 'Your plant analysis history will appear here',
+    viewDetails: 'View Details',
+    noPhotoSelected: 'No photo selected',
+    takeOrChoose: 'Take or choose a leaf photo to begin',
+    changePhoto: '✕ Change Photo',
+    diagnosis: 'Diagnosis',
+    healthy: 'Healthy',
+    unknown: 'Unknown',
+    yourPlantHealthy: 'Your Plant is Healthy!',
+    greatNews: 'Great news! No diseases detected. Your plant appears to be in excellent condition.',
+    overallHealth: 'Overall Plant Health',
+    permissionNeeded: 'Permission needed',
+    cameraPermission: 'We need access to your camera to take photos.',
+    photoPermission: 'We need access to your photos to analyze plant health.',
+    networkError: 'Network error. Make sure:',
+    backendRunning: 'Backend server is running on',
+    phoneInternet: 'Your phone has internet access',
+    tryDisableVPN: 'Try disabling VPN if enabled',
+    whatsWrong: "What's Wrong?",
+    whatYouShouldDo: 'What You Should Do',
+    whyThisHappened: 'Why This Happened',
+    actionImpact: 'Action Timeline & Impact',
+    actionNeeded: 'Action Needed:',
+    economicImpact: 'Economic Impact:',
+    spreadRisk: 'Spread Risk:',
+    recoveryTime: 'Recovery Time:',
+    organicSolutions: 'Organic/Natural Solutions:',
+    chemicalSolutions: 'Chemical Solutions:',
+    recommendedProducts: 'Recommended Products',
+    sprayWindow: 'Spray Window & Application',
+    applicationInstructions: 'Application Instructions:',
+    sprayTiming: 'Spray Timing:',
+    supplyChecklist: 'Supply Checklist',
+    prevention: 'Prevention',
+    isolationSanitation: 'Isolation & Sanitation',
+    safetyProtocol: 'Safety & Hygiene Protocol',
+    rescanReminder: 'Rescan Reminder',
+    harvestSafety: 'Harvest Withdrawal',
+    photoTip: 'Photo Tip',
+    error: 'Error',
+    failedToPickImage: 'Failed to pick image:',
+    permissionDenied: 'Permission denied',
+    cameraAccessRequired: 'Camera access is required to take photos.',
+    failedToTakePhoto: 'Failed to take photo:',
+    noImage: 'No Image',
+    pleaseSelectPhoto: 'Please select or take a photo first.',
+    preventionHarvestGuide: 'Prevention & Harvest Guide',
+    preventionTipsLabel: '🛡️ Prevention Tips:',
+    harvestStatus: '🌾 Harvest Status:',
+    treatmentPlaybookTitle: 'Treatment Playbook',
+    bestSprayWindow: '🕒 Best Spray Window:',
+    mixApplySteps: '📋 Mix & Apply Steps:',
+    supplyChecklistLabel: '🧰 Supply Checklist:',
+    safetyHygieneTitle: 'Safety & Hygiene',
+    isolationCleanup: '🚧 Isolation & Clean-Up:',
+    harvestWait: '⏳ Harvest Wait:',
+    whenToRescan: '🔄 When to Rescan:',
+    waterNutritionTitle: 'Water & Nutrition',
+    irrigationFeeding: '💦 Irrigation & Feeding:',
+    fieldChecklistTitle: 'Field Checklist',
+    watchThisWeek: '👀 Watch This Week:',
+    photoTipLabel: '📸 Photo Tip:',
+    recommendedProductsTitle: 'Recommended Products',
+    tapToViewProducts: 'Tap to view {count} recommended items from Amazon/Flipkart.',
+    advancedHealthIndicators: 'Advanced Health Indicators',
+    plantNutrition: '🌱 Plant Nutrition (Nitrogen)',
+    goodNitrogen: '✅ Good! Your plant has enough nitrogen',
+    lowNitrogen: '⚠️ Low nitrogen - add nitrogen fertilizer (like urea or compost)',
+    moderateNitrogen: '⚠️ Moderate nitrogen - monitor and fertilize if needed',
+    spreadRiskLabel: 'Spread risk:',
+    unknownError: 'Unknown error occurred.',
+    serverError: 'Server error:',
+    howToUse: 'How to Use',
+    step1: 'Take a clear photo of a single leaf',
+    step2: 'Our AI will analyze your plant\'s health',
+    step3: 'Get clear recommendations on what to do',
+    step4: 'Follow the steps to help your plant recover',
+    tip: 'Tip: For best results, take the photo in good lighting with the leaf clearly visible.',
+    analysisHistory: 'Analysis History',
+    previousUploads: 'Previous uploads and results',
+    noHistoryYet: 'No history yet',
+    runAnalysisToSee: 'Run an analysis to see it saved here.',
+  },
+  mr: {
+    appTitle: 'पाळी आरोग्य तपासणी',
+    appSubtitle: 'AI-आधारित पाळी रोग शोध',
+    gallery: 'गॅलरी',
+    camera: 'कॅमेरा',
+    checkPlantHealth: 'पाळी आरोग्य तपासा',
+    tapToAnalyze: 'विश्लेषण करण्यासाठी टॅप करा',
+    home: 'मुख्य',
+    history: 'इतिहास',
+    analyzing: 'विश्लेषण करत आहे...',
+    pleaseWait: 'कृपया थांबा आम्ही तुमच्या पाळीचे विश्लेषण करत आहोत...',
+    analysisFailed: 'विश्लेषण अयशस्वी',
+    diseaseDetected: 'रोग आढळला',
+    healthyPlant: 'निरोगी पाळी!',
+    severity: 'तीव्रता',
+    confidence: 'आत्मविश्वास',
+    symptoms: 'लक्षणे',
+    possibleCauses: 'संभाव्य कारणे',
+    treatment: 'उपचार',
+    recommendations: 'शिफारसी',
+    actionTimeline: 'कृती वेळापत्रक',
+    treatmentSolutions: 'उपचार उपाय',
+    preventionTips: 'प्रतिबंध टिप्स',
+    treatmentPlaybook: 'उपचार मार्गदर्शक',
+    safetyHygiene: 'सुरक्षितता आणि स्वच्छता',
+    waterNutrition: 'पाणी आणि पोषण',
+    fieldChecklist: 'शेत तपासणी यादी',
+    viewProducts: 'उत्पादन शिफारसी पहा',
+    productRecommendations: 'उत्पादन शिफारसी',
+    close: 'बंद करा',
+    buyNow: 'आता खरेदी करा',
+    clearHistory: 'इतिहास साफ करा',
+    confirmClear: 'तुम्हाला खात्री आहे की तुम्ही सर्व इतिहास साफ करू इच्छिता?',
+    cancel: 'रद्द करा',
+    noHistory: 'विश्लेषण इतिहास नाही',
+    noHistoryDesc: 'तुमचा पाळी विश्लेषण इतिहास येथे दिसेल',
+    viewDetails: 'तपशील पहा',
+    noPhotoSelected: 'कोणताही फोटो निवडलेला नाही',
+    takeOrChoose: 'सुरू करण्यासाठी पानाचा फोटो घ्या किंवा निवडा',
+    changePhoto: '✕ फोटो बदला',
+    diagnosis: 'निदान',
+    healthy: 'निरोगी',
+    unknown: 'अज्ञात',
+    yourPlantHealthy: 'तुमची पाळी निरोगी आहे!',
+    greatNews: 'आनंदाची बातमी! कोणतेही रोग आढळले नाहीत. तुमची पाळी उत्तम स्थितीत आहे.',
+    overallHealth: 'एकूण पाळी आरोग्य',
+    permissionNeeded: 'परवानगी आवश्यक',
+    cameraPermission: 'फोटो काढण्यासाठी आम्हाला तुमच्या कॅमेराचा प्रवेश हवा आहे.',
+    photoPermission: 'पाळी आरोग्य विश्लेषणासाठी आम्हाला तुमच्या फोटोंचा प्रवेश हवा आहे.',
+    networkError: 'नेटवर्क त्रुटी. खात्री करा:',
+    backendRunning: 'बॅकएंड सर्व्हर चालू आहे',
+    phoneInternet: 'तुमच्या फोनला इंटरनेट प्रवेश आहे',
+    tryDisableVPN: 'VPN सक्षम असल्यास अक्षम करण्याचा प्रयत्न करा',
+    whatsWrong: 'काय चूक आहे?',
+    whatYouShouldDo: 'तुम्ही काय केले पाहिजे',
+    whyThisHappened: 'हे का झाले',
+    actionImpact: 'कृती वेळापत्रक आणि प्रभाव',
+    actionNeeded: 'आवश्यक कृती:',
+    economicImpact: 'आर्थिक प्रभाव:',
+    spreadRisk: 'प्रसार धोका:',
+    recoveryTime: 'पुनर्प्राप्ती वेळ:',
+    organicSolutions: 'सेंद्रिय/नैसर्गिक उपाय:',
+    chemicalSolutions: 'रासायनिक उपाय:',
+    recommendedProducts: 'शिफारस केलेली उत्पादने',
+    sprayWindow: 'फवारणी विंडो आणि अनुप्रयोग',
+    applicationInstructions: 'अनुप्रयोग सूचना:',
+    sprayTiming: 'फवारणी वेळ:',
+    supplyChecklist: 'पुरवठा तपासणी यादी',
+    prevention: 'प्रतिबंध',
+    isolationSanitation: 'अलगीकरण आणि स्वच्छता',
+    safetyProtocol: 'सुरक्षितता आणि स्वच्छता प्रोटोकॉल',
+    rescanReminder: 'पुन्हा स्कॅन स्मरणपत्र',
+    harvestSafety: 'कापणी विथड्रॉल',
+    photoTip: 'फोटो टीप',
+    error: 'त्रुटी',
+    failedToPickImage: 'प्रतिमा निवडण्यात अयशस्वी:',
+    permissionDenied: 'परवानगी नाकारली',
+    cameraAccessRequired: 'फोटो काढण्यासाठी कॅमेरा प्रवेश आवश्यक आहे.',
+    failedToTakePhoto: 'फोटो काढण्यात अयशस्वी:',
+    noImage: 'कोणतीही प्रतिमा नाही',
+    pleaseSelectPhoto: 'कृपया प्रथम फोटो निवडा किंवा घ्या.',
+    preventionHarvestGuide: 'प्रतिबंध आणि कापणी मार्गदर्शक',
+    preventionTipsLabel: '🛡️ प्रतिबंध टिप्स:',
+    harvestStatus: '🌾 कापणी स्थिती:',
+    treatmentPlaybookTitle: 'उपचार मार्गदर्शक',
+    bestSprayWindow: '🕒 सर्वोत्तम फवारणी वेळ:',
+    mixApplySteps: '📋 मिश्रण आणि वापर पायर्‍या:',
+    supplyChecklistLabel: '🧰 पुरवठा यादी:',
+    safetyHygieneTitle: 'सुरक्षितता आणि स्वच्छता',
+    isolationCleanup: '🚧 अलगीकरण आणि साफसफाई:',
+    harvestWait: '⏳ कापणी प्रतीक्षा:',
+    whenToRescan: '🔄 पुन्हा स्कॅन केव्हा करावे:',
+    waterNutritionTitle: 'पाणी आणि पोषण',
+    irrigationFeeding: '💦 सिंचन आणि आहार:',
+    fieldChecklistTitle: 'शेत तपासणी यादी',
+    watchThisWeek: '👀 या आठवड्यात पहा:',
+    photoTipLabel: '📸 फोटो टीप:',
+    recommendedProductsTitle: 'शिफारस केलेली उत्पादने',
+    tapToViewProducts: 'Amazon/Flipkart वरून {count} शिफारस केलेल्या वस्तू पाहण्यासाठी टॅप करा.',
+    advancedHealthIndicators: 'प्रगत आरोग्य निर्देशक',
+    plantNutrition: '🌱 पाळी पोषण (नायट्रोजन)',
+    goodNitrogen: '✅ चांगले! तुमच्या पाळीमध्ये पुरेसे नायट्रोजन आहे',
+    lowNitrogen: '⚠️ कमी नायट्रोजन - नायट्रोजन खत (जसे युरिया किंवा खत) जोडा',
+    moderateNitrogen: '⚠️ मध्यम नायट्रोजन - निरीक्षण करा आणि आवश्यक असल्यास खत घाला',
+    spreadRiskLabel: 'प्रसार धोका:',
+    unknownError: 'अज्ञात त्रुटी आली.',
+    serverError: 'सर्व्हर त्रुटी:',
+    howToUse: 'कसे वापरायचे',
+    step1: 'एका पानाचा स्पष्ट फोटो घ्या',
+    step2: 'आमचा AI तुमच्या पाळीचे आरोग्य विश्लेषण करेल',
+    step3: 'काय करायचे याबद्दल स्पष्ट शिफारसी मिळवा',
+    step4: 'तुमच्या पाळीच्या पुनर्प्राप्तीसाठी पायर्‍या अनुसरण करा',
+    tip: 'टीप: सर्वोत्तम परिणामांसाठी, चांगल्या प्रकाशात पाण स्पष्टपणे दिसणारे फोटो घ्या.',
+    analysisHistory: 'विश्लेषण इतिहास',
+    previousUploads: 'मागील अपलोड आणि परिणाम',
+    noHistoryYet: 'अद्याप इतिहास नाही',
+    runAnalysisToSee: 'इथे सेव्ह केलेले पाहण्यासाठी विश्लेषण चलवा.',
+  },
+  hi: {
+    appTitle: 'पौधे की स्वास्थ्य जांच',
+    appSubtitle: 'AI-आधारित पौधे की बीमारी का पता लगाना',
+    gallery: 'गैलरी',
+    camera: 'कैमरा',
+    checkPlantHealth: 'पौधे की स्वास्थ्य जांचें',
+    tapToAnalyze: 'विश्लेषण के लिए टैप करें',
+    home: 'होम',
+    history: 'इतिहास',
+    analyzing: 'विश्लेषण हो रहा है...',
+    pleaseWait: 'कृपया प्रतीक्षा करें जब हम आपके पौधे का विश्लेषण कर रहे हैं...',
+    analysisFailed: 'विश्लेषण विफल',
+    diseaseDetected: 'बीमारी का पता चला',
+    healthyPlant: 'स्वस्थ पौधा!',
+    severity: 'गंभीरता',
+    confidence: 'विश्वास',
+    symptoms: 'लक्षण',
+    possibleCauses: 'संभावित कारण',
+    treatment: 'उपचार',
+    recommendations: 'सिफारिशें',
+    actionTimeline: 'कार्य समय-सारणी',
+    treatmentSolutions: 'उपचार समाधान',
+    preventionTips: 'रोकथाम युक्तियाँ',
+    treatmentPlaybook: 'उपचार मार्गदर्शिका',
+    safetyHygiene: 'सुरक्षा और स्वच्छता',
+    waterNutrition: 'पानी और पोषण',
+    fieldChecklist: 'खेत चेकलिस्ट',
+    viewProducts: 'उत्पाद सिफारिशें देखें',
+    productRecommendations: 'उत्पाद सिफारिशें',
+    close: 'बंद करें',
+    buyNow: 'अभी खरीदें',
+    clearHistory: 'इतिहास साफ़ करें',
+    confirmClear: 'क्या आप वाकई सभी इतिहास साफ़ करना चाहते हैं?',
+    cancel: 'रद्द करें',
+    noHistory: 'कोई विश्लेषण इतिहास नहीं',
+    noHistoryDesc: 'आपका पौधा विश्लेषण इतिहास यहाँ दिखाई देगा',
+    viewDetails: 'विवरण देखें',
+    noPhotoSelected: 'कोई फोटो नहीं चुना गया',
+    takeOrChoose: 'शुरू करने के लिए पत्ती की फोटो लें या चुनें',
+    changePhoto: '✕ फोटो बदलें',
+    diagnosis: 'निदान',
+    healthy: 'स्वस्थ',
+    unknown: 'अज्ञात',
+    yourPlantHealthy: 'आपका पौधा स्वस्थ है!',
+    greatNews: 'बढ़िया खबर! कोई बीमारी नहीं पाई गई। आपका पौधा उत्कृष्ट स्थिति में है।',
+    overallHealth: 'समग्र पौधे की स्वास्थ्य',
+    permissionNeeded: 'अनुमति आवश्यक',
+    cameraPermission: 'हमें फोटो लेने के लिए आपके कैमरे तक पहुंच की आवश्यकता है।',
+    photoPermission: 'हमें पौधे की स्वास्थ्य का विश्लेषण करने के लिए आपकी फोटो तक पहुंच की आवश्यकता है।',
+    networkError: 'नेटवर्क त्रुटि। सुनिश्चित करें:',
+    backendRunning: 'बैकएंड सर्वर चल रहा है',
+    phoneInternet: 'आपके फोन में इंटरनेट एक्सेस है',
+    tryDisableVPN: 'यदि सक्षम हो तो VPN अक्षम करने का प्रयास करें',
+    whatsWrong: 'क्या गलत है?',
+    whatYouShouldDo: 'आपको क्या करना चाहिए',
+    whyThisHappened: 'यह क्यों हुआ',
+    actionImpact: 'कार्य समय-सारणी और प्रभाव',
+    actionNeeded: 'आवश्यक कार्रवाई:',
+    economicImpact: 'आर्थिक प्रभाव:',
+    spreadRisk: 'फैलाव जोखिम:',
+    recoveryTime: 'रिकवरी समय:',
+    organicSolutions: 'जैविक/प्राकृतिक समाधान:',
+    chemicalSolutions: 'रासायनिक समाधान:',
+    recommendedProducts: 'अनुशंसित उत्पाद',
+    sprayWindow: 'स्प्रे विंडो और अनुप्रयोग',
+    applicationInstructions: 'अनुप्रयोग निर्देश:',
+    sprayTiming: 'स्प्रे समय:',
+    supplyChecklist: 'आपूर्ति चेकलिस्ट',
+    prevention: 'रोकथाम',
+    isolationSanitation: 'अलगाव और स्वच्छता',
+    safetyProtocol: 'सुरक्षा और स्वच्छता प्रोटोकॉल',
+    rescanReminder: 'पुनः स्कैन अनुस्मारक',
+    harvestSafety: 'फसल वापसी',
+    photoTip: 'फोटो टिप',
+    error: 'त्रुटि',
+    failedToPickImage: 'छवि चुनने में विफल:',
+    permissionDenied: 'अनुमति अस्वीकृत',
+    cameraAccessRequired: 'फोटो लेने के लिए कैमरा एक्सेस आवश्यक है।',
+    failedToTakePhoto: 'फोटो लेने में विफल:',
+    noImage: 'कोई छवि नहीं',
+    pleaseSelectPhoto: 'कृपया पहले फोटो चुनें या लें।',
+    preventionHarvestGuide: 'रोकथाम और फसल मार्गदर्शिका',
+    preventionTipsLabel: '🛡️ रोकथाम युक्तियाँ:',
+    harvestStatus: '🌾 फसल की स्थिति:',
+    treatmentPlaybookTitle: 'उपचार मार्गदर्शिका',
+    bestSprayWindow: '🕒 सबसे अच्छा स्प्रे समय:',
+    mixApplySteps: '📋 मिक्स और अप्लाई चरण:',
+    supplyChecklistLabel: '🧰 आपूर्ति चेकलिस्ट:',
+    safetyHygieneTitle: 'सुरक्षा और स्वच्छता',
+    isolationCleanup: '🚧 अलगाव और सफाई:',
+    harvestWait: '⏳ फसल प्रतीक्षा:',
+    whenToRescan: '🔄 पुनः स्कैन कब करें:',
+    waterNutritionTitle: 'पानी और पोषण',
+    irrigationFeeding: '💦 सिंचाई और भोजन:',
+    fieldChecklistTitle: 'खेत चेकलिस्ट',
+    watchThisWeek: '👀 इस सप्ताह देखें:',
+    photoTipLabel: '📸 फोटो टिप:',
+    recommendedProductsTitle: 'अनुशंसित उत्पाद',
+    tapToViewProducts: 'Amazon/Flipkart से {count} अनुशंसित वस्तुओं को देखने के लिए टैप करें।',
+    advancedHealthIndicators: 'उन्नत स्वास्थ्य संकेतक',
+    plantNutrition: '🌱 पौधे का पोषण (नाइट्रोजन)',
+    goodNitrogen: '✅ अच्छा! आपके पौधे में पर्याप्त नाइट्रोजन है',
+    lowNitrogen: '⚠️ कम नाइट्रोजन - नाइट्रोजन उर्वरक (जैसे यूरिया या खाद) जोड़ें',
+    moderateNitrogen: '⚠️ मध्यम नाइट्रोजन - निगरानी करें और यदि आवश्यक हो तो उर्वरक डालें',
+    spreadRiskLabel: 'फैलाव जोखिम:',
+    unknownError: 'अज्ञात त्रुटि हुई।',
+    serverError: 'सर्वर त्रुटि:',
+    howToUse: 'कैसे उपयोग करें',
+    step1: 'एक पत्ती की स्पष्ट तस्वीर लें',
+    step2: 'हमारा AI आपके पौधे के स्वास्थ्य का विश्लेषण करेगा',
+    step3: 'क्या करना चाहिए इसके बारे में स्पष्ट सिफारिशें प्राप्त करें',
+    step4: 'अपने पौधे को ठीक करने के लिए निर्देशों का पालन करें',
+    tip: 'सुझाव: सर्वोत्तम परिणामों के लिए, अच्छी रोशनी में पत्ती को स्पष्ट रूप से दिखाई देने वाली तस्वीर लें।',
+    analysisHistory: 'विश्लेषण इतिहास',
+    previousUploads: 'पिछले अपलोड और परिणाम',
+    noHistoryYet: 'अभी तक कोई इतिहास नहीं',
+    runAnalysisToSee: 'यहां सहेजी गई चीज़ को देखने के लिए एक विश्लेषण चलाएं।',
+  }
+};
 
 export default function App() {
   const [image, setImage] = useState(null);
@@ -38,6 +398,8 @@ export default function App() {
   const [productModalVisible, setProductModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [history, setHistory] = useState([]);
+  const [language, setLanguage] = useState('en');
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
   
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -143,6 +505,41 @@ export default function App() {
     })();
   }, []);
 
+  // Load saved language on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const savedLang = await AsyncStorage.getItem(LANGUAGE_KEY);
+        if (savedLang && (savedLang === 'en' || savedLang === 'mr')) {
+          setLanguage(savedLang);
+        }
+      } catch (err) {
+        console.warn('Failed to load language', err);
+      }
+    })();
+  }, []);
+
+  // Helper to get translated text
+  const t = (key) => translations[language][key] || key;
+
+  // Language options
+  const languageOptions = [
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  ];
+
+  // Change language
+  const changeLanguage = async (langCode) => {
+    setLanguage(langCode);
+    setLanguageModalVisible(false);
+    try {
+      await AsyncStorage.setItem(LANGUAGE_KEY, langCode);
+    } catch (err) {
+      console.warn('Failed to save language', err);
+    }
+  };
+
   // Animate health progress bar
   useEffect(() => {
     if (result?.feature_analysis?.combined_analysis?.['10_stress_indicators']) {
@@ -181,7 +578,7 @@ export default function App() {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission needed', 'We need access to your photos to analyze plant health.');
+        Alert.alert(t('permissionNeeded'), t('photoPermission'));
         return;
       }
 
@@ -204,7 +601,7 @@ export default function App() {
         }).start();
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to pick image: ' + error.message);
+      Alert.alert(t('error'), t('failedToPickImage') + ' ' + error.message);
     }
   };
 
@@ -213,11 +610,11 @@ export default function App() {
     animateButtonPress();
     try {
       if (hasPermission === null) {
-        Alert.alert('Permission needed', 'Camera permission is required.');
+        Alert.alert(t('permissionNeeded'), t('cameraPermission'));
         return;
       }
       if (hasPermission === false) {
-        Alert.alert('Permission denied', 'Camera access is required to take photos.');
+        Alert.alert(t('permissionDenied'), t('cameraAccessRequired'));
         return;
       }
 
@@ -239,14 +636,14 @@ export default function App() {
         }).start();
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to take photo: ' + error.message);
+      Alert.alert(t('error'), t('failedToTakePhoto') + ' ' + error.message);
     }
   };
 
   // Analyze image
   const analyzeImage = async () => {
     if (!image) {
-      Alert.alert('No Image', 'Please select or take a photo first.');
+      Alert.alert(t('noImage'), t('pleaseSelectPhoto'));
       return;
     }
 
@@ -265,6 +662,9 @@ export default function App() {
         name: filename,
         type: type,
       });
+      
+      // Add language parameter for translated results
+      formData.append('language', language);
 
       const response = await axios.post(`${API_URL}/disease-detection-file`, formData, {
         headers: {
@@ -288,12 +688,12 @@ export default function App() {
       } else if (error.message === 'Network Error') {
         errorMessage += `Network error. Make sure:\n1. Backend server is running on ${API_URL}\n2. Your phone has internet access\n3. Try disabling VPN if enabled`;
       } else if (error.response) {
-        errorMessage += error.response.data?.detail || `Server error: ${error.response.status}`;
+        errorMessage += error.response.data?.detail || `${t('serverError')} ${error.response.status}`;
       } else {
-        errorMessage += error.message || 'Unknown error occurred.';
+        errorMessage += error.message || t('unknownError');
       }
       
-      Alert.alert('Analysis Failed', errorMessage);
+      Alert.alert(t('analysisFailed'), errorMessage);
     } finally {
       setLoading(false);
     }
@@ -409,8 +809,20 @@ export default function App() {
             },
           ]}
         >
-          <Text style={styles.headerTitle}>🌿 Plant Health Check</Text>
-          <Text style={styles.headerSubtitle}>AI-Powered Plant Disease Detection</Text>
+          <View style={styles.headerContent}>
+            <View style={{ flex: 1, marginRight: 8 }}>
+              <Text style={styles.headerTitle} numberOfLines={2}>🌿 {t('appTitle')}</Text>
+              <Text style={styles.headerSubtitle} numberOfLines={2}>{t('appSubtitle')}</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.languageButton}
+              onPress={() => setLanguageModalVisible(true)}
+            >
+              <Text style={styles.languageButtonText}>
+                {languageOptions.find(l => l.code === language)?.flag} 🌐
+              </Text>
+            </TouchableOpacity>
+          </View>
         </Animated.View>
       </LinearGradient>
 
@@ -467,8 +879,8 @@ export default function App() {
               ]}
             >
               <Text style={styles.placeholderIcon}>📷</Text>
-              <Text style={styles.placeholderText}>No photo selected</Text>
-              <Text style={styles.placeholderHint}>Take or choose a leaf photo to begin</Text>
+              <Text style={styles.placeholderText}>{t('noPhotoSelected')}</Text>
+              <Text style={styles.placeholderHint}>{t('takeOrChoose')}</Text>
             </Animated.View>
           )}
 
@@ -489,7 +901,7 @@ export default function App() {
                   <View style={styles.buttonIconContainer}>
                     <Text style={styles.buttonIcon}>📷</Text>
                   </View>
-                  <Text style={styles.buttonText}>Gallery</Text>
+                  <Text style={styles.buttonText}>{t('gallery')}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </Animated.View>
@@ -509,7 +921,7 @@ export default function App() {
                   <View style={styles.buttonIconContainer}>
                     <Text style={styles.buttonIcon}>📸</Text>
                   </View>
-                  <Text style={styles.buttonText}>Camera</Text>
+                  <Text style={styles.buttonText}>{t('camera')}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </Animated.View>
@@ -534,15 +946,15 @@ export default function App() {
                       <Animated.View style={{ opacity: shimmerOpacity }}>
                         <ActivityIndicator color="#fff" size="small" />
                       </Animated.View>
-                      <Text style={styles.analyzeButtonText}>Analyzing...</Text>
+                      <Text style={styles.analyzeButtonText}>{t('analyzing')}</Text>
                     </View>
                   ) : (
                     <>
                       <View style={styles.analyzeIconContainer}>
                         <Text style={styles.analyzeButtonIcon}>🔍</Text>
                       </View>
-                      <Text style={styles.analyzeButtonText}>Check Plant Health</Text>
-                      <Text style={styles.analyzeButtonSubtext}>Tap to analyze</Text>
+                      <Text style={styles.analyzeButtonText}>{t('checkPlantHealth')}</Text>
+                      <Text style={styles.analyzeButtonSubtext}>{t('tapToAnalyze')}</Text>
                     </>
                   )}
                 </LinearGradient>
@@ -581,7 +993,7 @@ export default function App() {
                     </Text>
                   </View>
                   <Text style={[styles.statusTitle, { color: getStatusColor(result.severity) }]}>
-                    {result.disease_name || 'Disease Detected'}
+                    {result.disease_name || t('diseaseDetected')}
                   </Text>
                   <View style={styles.badgeContainer}>
                     <View
@@ -593,7 +1005,7 @@ export default function App() {
                       ]}
                     >
                       <Text style={styles.badgeTextWhite}>
-                        {result.severity?.toUpperCase() || 'UNKNOWN'}
+                        {result.severity?.toUpperCase() || t('unknown').toUpperCase()}
                       </Text>
                     </View>
                     <View style={[styles.badge, styles.badgeInfo]}>
@@ -614,10 +1026,10 @@ export default function App() {
                     <Text style={[styles.statusIcon, { fontSize: 56 }]}>✅</Text>
                   </View>
                   <Text style={[styles.statusTitle, styles.statusTitleHealthy]}>
-                    Your Plant is Healthy!
+                    {t('yourPlantHealthy')}
                   </Text>
                   <Text style={styles.healthyMessage}>
-                    Great news! No diseases detected. Your plant appears to be in excellent condition.
+                    {t('greatNews')}
                   </Text>
                 </LinearGradient>
               </View>
@@ -634,8 +1046,8 @@ export default function App() {
                 <View style={[styles.miniIconBadge, { backgroundColor: 'rgba(255,255,255,0.18)' }]}>
                   <Text style={styles.miniIcon}>🩺</Text>
                 </View>
-                <Text style={styles.miniLabel}>Diagnosis</Text>
-                <Text style={styles.miniValue}>{result.disease_name || 'Healthy'}</Text>
+                <Text style={styles.miniLabel}>{t('diagnosis')}</Text>
+                <Text style={styles.miniValue}>{result.disease_name || t('healthy')}</Text>
               </LinearGradient>
 
               <LinearGradient
@@ -647,8 +1059,8 @@ export default function App() {
                 <View style={[styles.miniIconBadge, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
                   <Text style={styles.miniIcon}>📈</Text>
                 </View>
-                <Text style={styles.miniLabel}>Severity</Text>
-                <Text style={styles.miniValue}>{(result.severity || 'Unknown').toUpperCase()}</Text>
+                <Text style={styles.miniLabel}>{t('severity')}</Text>
+                <Text style={styles.miniValue}>{(result.severity || t('unknown')).toUpperCase()}</Text>
               </LinearGradient>
 
               <LinearGradient
@@ -660,7 +1072,7 @@ export default function App() {
                 <View style={[styles.miniIconBadge, { backgroundColor: 'rgba(255,255,255,0.18)' }]}>
                   <Text style={styles.miniIcon}>✅</Text>
                 </View>
-                <Text style={styles.miniLabel}>Confidence</Text>
+                <Text style={styles.miniLabel}>{t('confidence')}</Text>
                 <Text style={styles.miniValue}>{Math.round(result.confidence || 0)}%</Text>
               </LinearGradient>
             </View>
@@ -675,10 +1087,10 @@ export default function App() {
               >
                 <Text style={styles.actionBandIcon}>⏰</Text>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.actionBandTitle}>Action Timeline</Text>
+                  <Text style={styles.actionBandTitle}>{t('actionTimeline')}</Text>
                   <Text style={styles.actionBandText}>{result.farmer_recommendations.action_urgency}</Text>
                   {result.farmer_recommendations.spread_risk && (
-                    <Text style={styles.actionBandSubtext}>Spread risk: {result.farmer_recommendations.spread_risk}</Text>
+                    <Text style={styles.actionBandSubtext}>{t('spreadRiskLabel')} {result.farmer_recommendations.spread_risk}</Text>
                   )}
                 </View>
               </LinearGradient>
@@ -758,7 +1170,7 @@ export default function App() {
                   <View style={styles.iconBadge}>
                     <Text style={styles.sectionIcon}>🔍</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>What's Wrong?</Text>
+                  <Text style={styles.sectionTitle}>{t('whatsWrong')}</Text>
                 </View>
                 {result.symptoms.map((symptom, index) => (
                   <Animated.View
@@ -792,7 +1204,7 @@ export default function App() {
                   <View style={[styles.iconBadge, styles.iconBadgeSuccess]}>
                     <Text style={styles.sectionIcon}>💡</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>What You Should Do</Text>
+                  <Text style={styles.sectionTitle}>{t('whatYouShouldDo')}</Text>
                 </View>
                 {result.treatment.map((action, index) => (
                   <View key={index} style={styles.listItem}>
@@ -817,7 +1229,7 @@ export default function App() {
                   <View style={[styles.iconBadge, styles.iconBadgeInfo]}>
                     <Text style={styles.sectionIcon}>🤔</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>Why This Happened</Text>
+                  <Text style={styles.sectionTitle}>{t('whyThisHappened')}</Text>
                 </View>
                 {result.possible_causes.map((cause, index) => (
                   <View key={index} style={styles.listItem}>
@@ -837,33 +1249,33 @@ export default function App() {
                     <View style={[styles.iconBadge, { backgroundColor: '#ff5722' }]}>
                       <Text style={styles.sectionIcon}>⏰</Text>
                     </View>
-                    <Text style={styles.sectionTitle}>Action Timeline & Impact</Text>
+                    <Text style={styles.sectionTitle}>{t('actionImpact')}</Text>
                   </View>
                   
                   {result.farmer_recommendations.action_urgency && (
                     <View style={styles.farmCard}>
-                      <Text style={styles.farmLabel}>⚡ Action Needed:</Text>
+                      <Text style={styles.farmLabel}>⚡ {t('actionNeeded')}</Text>
                       <Text style={styles.farmValue}>{result.farmer_recommendations.action_urgency}</Text>
                     </View>
                   )}
                   
                   {result.farmer_recommendations.economic_impact && (
                     <View style={styles.farmCard}>
-                      <Text style={styles.farmLabel}>💰 Economic Impact:</Text>
+                      <Text style={styles.farmLabel}>💰 {t('economicImpact')}</Text>
                       <Text style={styles.farmValue}>{result.farmer_recommendations.economic_impact}</Text>
                     </View>
                   )}
                   
                   {result.farmer_recommendations.spread_risk && (
                     <View style={styles.farmCard}>
-                      <Text style={styles.farmLabel}>🌾 Spread Risk:</Text>
+                      <Text style={styles.farmLabel}>🌾 {t('spreadRisk')}</Text>
                       <Text style={styles.farmValue}>{result.farmer_recommendations.spread_risk}</Text>
                     </View>
                   )}
                   
                   {result.farmer_recommendations.estimated_recovery_time && (
                     <View style={styles.farmCard}>
-                      <Text style={styles.farmLabel}>⏱️ Recovery Time:</Text>
+                      <Text style={styles.farmLabel}>⏱️ {t('recoveryTime')}</Text>
                       <Text style={styles.farmValue}>{result.farmer_recommendations.estimated_recovery_time}</Text>
                     </View>
                   )}
@@ -876,12 +1288,12 @@ export default function App() {
                       <View style={[styles.iconBadge, { backgroundColor: '#4caf50' }]}>
                         <Text style={styles.sectionIcon}>🌿</Text>
                       </View>
-                      <Text style={styles.sectionTitle}>Treatment Solutions</Text>
+                      <Text style={styles.sectionTitle}>{t('treatmentSolutions')}</Text>
                     </View>
 
                     {result.farmer_recommendations.organic_solutions && result.farmer_recommendations.organic_solutions.length > 0 && (
                       <View style={styles.treatmentSection}>
-                        <Text style={styles.treatmentTitle}>🍃 Organic/Natural Solutions:</Text>
+                        <Text style={styles.treatmentTitle}>🍃 {t('organicSolutions')}</Text>
                         {result.farmer_recommendations.organic_solutions.map((solution, index) => (
                           <View key={index} style={styles.listItem}>
                             <View style={[styles.bulletPoint, { backgroundColor: '#4caf50' }]} />
@@ -893,7 +1305,7 @@ export default function App() {
 
                     {result.farmer_recommendations.chemical_solutions && result.farmer_recommendations.chemical_solutions.length > 0 && (
                       <View style={styles.treatmentSection}>
-                        <Text style={styles.treatmentTitle}>⚗️ Chemical Solutions:</Text>
+                        <Text style={styles.treatmentTitle}>⚗️ {t('chemicalSolutions')}</Text>
                         {result.farmer_recommendations.chemical_solutions.map((solution, index) => (
                           <View key={index} style={styles.listItem}>
                             <View style={[styles.bulletPoint, { backgroundColor: '#ff9800' }]} />
@@ -912,12 +1324,12 @@ export default function App() {
                     <View style={[styles.iconBadge, { backgroundColor: '#9c27b0' }]}>
                       <Text style={styles.sectionIcon}>🛡️</Text>
                     </View>
-                    <Text style={styles.sectionTitle}>Prevention & Harvest Guide</Text>
+                    <Text style={styles.sectionTitle}>{t('preventionHarvestGuide')}</Text>
                   </View>
 
                   {result.farmer_recommendations.prevention_tips && result.farmer_recommendations.prevention_tips.length > 0 && (
                     <View style={styles.treatmentSection}>
-                      <Text style={styles.treatmentTitle}>🛡️ Prevention Tips:</Text>
+                      <Text style={styles.treatmentTitle}>{t('preventionTipsLabel')}</Text>
                       {result.farmer_recommendations.prevention_tips.map((tip, index) => (
                         <View key={index} style={styles.listItem}>
                           <LinearGradient
@@ -936,7 +1348,7 @@ export default function App() {
 
                   {result.farmer_recommendations.harvest_recommendation && (
                     <View style={styles.farmCard}>
-                      <Text style={styles.farmLabel}>🌾 Harvest Status:</Text>
+                      <Text style={styles.farmLabel}>{t('harvestStatus')}</Text>
                       <Text style={styles.farmValue}>{result.farmer_recommendations.harvest_recommendation}</Text>
                     </View>
                   )}
@@ -952,19 +1364,19 @@ export default function App() {
                   <View style={[styles.iconBadge, { backgroundColor: '#0288d1' }]}>
                     <Text style={styles.sectionIcon}>🧴</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>Treatment Playbook</Text>
+                  <Text style={styles.sectionTitle}>{t('treatmentPlaybookTitle')}</Text>
                 </View>
 
                 {farmer.spray_window && (
                   <View style={styles.farmCard}>
-                    <Text style={styles.farmLabel}>🕒 Best Spray Window:</Text>
+                    <Text style={styles.farmLabel}>{t('bestSprayWindow')}</Text>
                     <Text style={styles.farmValue}>{farmer.spray_window}</Text>
                   </View>
                 )}
 
                 {farmer.application_recipe && Array.isArray(farmer.application_recipe) && farmer.application_recipe.length > 0 && (
                   <View style={styles.treatmentSection}>
-                    <Text style={styles.treatmentTitle}>📋 Mix & Apply Steps:</Text>
+                    <Text style={styles.treatmentTitle}>{t('mixApplySteps')}</Text>
                     {farmer.application_recipe.map((step, index) => (
                       <View key={index} style={styles.listItem}>
                         <LinearGradient colors={['#0288d1', '#0277bd']} style={styles.numberBadge}>
@@ -980,7 +1392,7 @@ export default function App() {
 
                 {farmer.supply_checklist && Array.isArray(farmer.supply_checklist) && farmer.supply_checklist.length > 0 && (
                   <View style={styles.treatmentSection}>
-                    <Text style={styles.treatmentTitle}>🧰 Supply Checklist:</Text>
+                    <Text style={styles.treatmentTitle}>{t('supplyChecklistLabel')}</Text>
                     <View style={styles.supplyRow}>
                       {farmer.supply_checklist.map((item, index) => (
                         <View key={index} style={styles.supplyChip}>
@@ -1000,12 +1412,12 @@ export default function App() {
                   <View style={[styles.iconBadge, { backgroundColor: '#c62828' }]}>
                     <Text style={styles.sectionIcon}>🧤</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>Safety & Hygiene</Text>
+                  <Text style={styles.sectionTitle}>{t('safetyHygieneTitle')}</Text>
                 </View>
 
                 {farmer.isolation_sanitation && Array.isArray(farmer.isolation_sanitation) && farmer.isolation_sanitation.length > 0 && (
                   <View style={styles.treatmentSection}>
-                    <Text style={styles.treatmentTitle}>🚧 Isolation & Clean-Up:</Text>
+                    <Text style={styles.treatmentTitle}>{t('isolationCleanup')}</Text>
                     {farmer.isolation_sanitation.map((tip, index) => (
                       <View key={index} style={styles.listItem}>
                         <View style={[styles.bulletPoint, { backgroundColor: '#c62828' }]} />
@@ -1017,14 +1429,14 @@ export default function App() {
 
                 {farmer.harvest_withdrawal && (
                   <View style={styles.farmCard}>
-                    <Text style={styles.farmLabel}>⏳ Harvest Wait:</Text>
+                    <Text style={styles.farmLabel}>{t('harvestWait')}</Text>
                     <Text style={styles.farmValue}>{farmer.harvest_withdrawal}</Text>
                   </View>
                 )}
 
                 {farmer.rescan_reminder && (
                   <View style={styles.farmCard}>
-                    <Text style={styles.farmLabel}>🔄 When to Rescan:</Text>
+                    <Text style={styles.farmLabel}>{t('whenToRescan')}</Text>
                     <Text style={styles.farmValue}>{farmer.rescan_reminder}</Text>
                   </View>
                 )}
@@ -1038,10 +1450,10 @@ export default function App() {
                   <View style={[styles.iconBadge, { backgroundColor: '#2e7d32' }]}>
                     <Text style={styles.sectionIcon}>💧</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>Water & Nutrition</Text>
+                  <Text style={styles.sectionTitle}>{t('waterNutritionTitle')}</Text>
                 </View>
                 <View style={styles.farmCard}>
-                  <Text style={styles.farmLabel}>💦 Irrigation & Feeding:</Text>
+                  <Text style={styles.farmLabel}>{t('irrigationFeeding')}</Text>
                   <Text style={styles.farmValue}>{farmer.water_nutrition}</Text>
                 </View>
               </View>
@@ -1054,12 +1466,12 @@ export default function App() {
                   <View style={[styles.iconBadge, { backgroundColor: '#6a1b9a' }]}>
                     <Text style={styles.sectionIcon}>📋</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>Field Checklist</Text>
+                  <Text style={styles.sectionTitle}>{t('fieldChecklistTitle')}</Text>
                 </View>
 
                 {farmer.scouting_checklist && Array.isArray(farmer.scouting_checklist) && farmer.scouting_checklist.length > 0 && (
                   <View style={styles.treatmentSection}>
-                    <Text style={styles.treatmentTitle}>👀 Watch This Week:</Text>
+                    <Text style={styles.treatmentTitle}>{t('watchThisWeek')}</Text>
                     {farmer.scouting_checklist.map((tip, index) => (
                       <View key={index} style={styles.listItem}>
                         <View style={[styles.bulletPoint, { backgroundColor: '#6a1b9a' }]} />
@@ -1071,7 +1483,7 @@ export default function App() {
 
                 {farmer.photo_tip && (
                   <View style={styles.farmCard}>
-                    <Text style={styles.farmLabel}>📸 Photo Tip:</Text>
+                    <Text style={styles.farmLabel}>{t('photoTipLabel')}</Text>
                     <Text style={styles.farmValue}>{farmer.photo_tip}</Text>
                   </View>
                 )}
@@ -1086,10 +1498,10 @@ export default function App() {
                     <View style={[styles.iconBadge, { backgroundColor: '#ffb300' }]}>
                       <Text style={styles.sectionIcon}>🛒</Text>
                     </View>
-                    <Text style={styles.sectionTitle}>Recommended Products</Text>
+                    <Text style={styles.sectionTitle}>{t('recommendedProductsTitle')}</Text>
                   </View>
                   <Text style={styles.listText}>
-                    Tap to view {productList.length} recommended items from Amazon/Flipkart.
+                    {t('tapToViewProducts').replace('{count}', productList.length)}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -1104,7 +1516,7 @@ export default function App() {
                   <View style={[styles.iconBadge, styles.iconBadgeAdvanced]}>
                     <Text style={styles.sectionIcon}>🔬</Text>
                   </View>
-                  <Text style={styles.sectionTitle}>Advanced Health Indicators</Text>
+                  <Text style={styles.sectionTitle}>{t('advancedHealthIndicators')}</Text>
                 </View>
 
                 {/* Chlorophyll Index */}
@@ -1116,16 +1528,16 @@ export default function App() {
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                     >
-                      <Text style={styles.featureTitle}>🌱 Plant Nutrition (Nitrogen)</Text>
+                      <Text style={styles.featureTitle}>{t('plantNutrition')}</Text>
                       {(() => {
                         const chlData = features['11_chlorophyll_index'];
                         const level = chlData.estimated_nitrogen_level || 'Unknown';
                         const explanation =
                           level === 'High'
-                            ? '✅ Good! Your plant has enough nitrogen'
+                            ? t('goodNitrogen')
                             : level === 'Low'
-                            ? '⚠️ Low nitrogen - add nitrogen fertilizer (like urea or compost)'
-                            : '⚠️ Moderate nitrogen - monitor and fertilize if needed';
+                            ? t('lowNitrogen')
+                            : t('moderateNitrogen');
                         const color = level === 'High' ? '#2e7d32' : level === 'Low' ? '#c62828' : '#f57c00';
                         
                         return (
@@ -1205,14 +1617,14 @@ export default function App() {
             >
               <View style={styles.instructionsHeader}>
                 <Text style={styles.instructionsIcon}>📖</Text>
-                <Text style={styles.instructionsTitle}>How to Use</Text>
+                <Text style={styles.instructionsTitle}>{t('howToUse')}</Text>
               </View>
               <View style={styles.instructionsList}>
                 {[
-                  'Take a clear photo of a single leaf',
-                  'Our AI will analyze your plant\'s health',
-                  'Get clear recommendations on what to do',
-                  'Follow the steps to help your plant recover',
+                  t('step1'),
+                  t('step2'),
+                  t('step3'),
+                  t('step4'),
                 ].map((text, index) => (
                   <View key={index} style={styles.instructionItem}>
                     <LinearGradient
@@ -1228,7 +1640,7 @@ export default function App() {
               <View style={styles.tipBox}>
                 <Text style={styles.tipIcon}>💡</Text>
                 <Text style={styles.tipText}>
-                  Tip: For best results, take the photo in good lighting with the leaf clearly visible.
+                  {t('tip')}
                 </Text>
               </View>
             </LinearGradient>
@@ -1245,8 +1657,8 @@ export default function App() {
         >
           <View style={styles.historyHeader}>
             <View>
-              <Text style={styles.historyTitle}>Analysis History</Text>
-              <Text style={styles.historySubtitle}>Previous uploads and results</Text>
+              <Text style={styles.historyTitle}>{t('analysisHistory')}</Text>
+              <Text style={styles.historySubtitle}>{t('previousUploads')}</Text>
             </View>
             {history.length > 0 && (
               <TouchableOpacity style={styles.clearButton} onPress={clearHistory}>
@@ -1258,8 +1670,8 @@ export default function App() {
           {history.length === 0 && (
             <View style={styles.historyEmpty}>
               <Text style={styles.historyEmptyIcon}>🕒</Text>
-              <Text style={styles.historyEmptyTitle}>No history yet</Text>
-              <Text style={styles.historyEmptyText}>Run an analysis to see it saved here.</Text>
+              <Text style={styles.historyEmptyTitle}>{t('noHistoryYet')}</Text>
+              <Text style={styles.historyEmptyText}>{t('runAnalysisToSee')}</Text>
             </View>
           )}
 
@@ -1290,16 +1702,59 @@ export default function App() {
           onPress={() => setActiveTab('home')}
         >
           <Text style={[styles.tabIcon, activeTab === 'home' && styles.tabIconActive]}>🏠</Text>
-          <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>Home</Text>
+          <Text style={[styles.tabLabel, activeTab === 'home' && styles.tabLabelActive]}>{t('home')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabItem, activeTab === 'history' && styles.tabItemActive]}
           onPress={() => setActiveTab('history')}
         >
           <Text style={[styles.tabIcon, activeTab === 'history' && styles.tabIconActive]}>🕓</Text>
-          <Text style={[styles.tabLabel, activeTab === 'history' && styles.tabLabelActive]}>History</Text>
+          <Text style={[styles.tabLabel, activeTab === 'history' && styles.tabLabelActive]}>{t('history')}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Language Selection Modal */}
+      <Modal
+        animationType="slide"
+        transparent
+        visible={languageModalVisible}
+        onRequestClose={() => setLanguageModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.languageModalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Language / भाषा चुनें / भाषा निवडा</Text>
+              <TouchableOpacity onPress={() => setLanguageModalVisible(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.languageOptionsContainer}>
+              {languageOptions.map((lang) => (
+                <TouchableOpacity
+                  key={lang.code}
+                  style={[
+                    styles.languageOption,
+                    language === lang.code && styles.languageOptionActive
+                  ]}
+                  onPress={() => changeLanguage(lang.code)}
+                >
+                  <Text style={styles.languageFlag}>{lang.flag}</Text>
+                  <Text style={[
+                    styles.languageName,
+                    language === lang.code && styles.languageNameActive
+                  ]}>
+                    {lang.name}
+                  </Text>
+                  {language === lang.code && (
+                    <Text style={styles.languageCheck}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Product Recommendations Modal */}
       <Modal
@@ -1387,7 +1842,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(14, 165, 233, 0.15)',
   },
   headerGradient: {
-    paddingTop: Platform.OS === 'ios' ? 0 : 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 60,
     paddingBottom: 32,
     paddingHorizontal: 24,
     shadowColor: '#7c3aed',
@@ -1397,27 +1852,55 @@ const styles = StyleSheet.create({
     elevation: 15,
   },
   header: {
+    alignItems: 'stretch',
+    justifyContent: 'center',
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 12,
+  },
+  languageButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    minWidth: 48,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  languageButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 0,
   },
   headerTitle: {
-    fontSize: 38,
-    fontWeight: '900',
+    fontSize: 20,
+    fontWeight: '800',
     color: '#fff',
-    marginBottom: 8,
+    marginBottom: 4,
     textShadowColor: 'rgba(0, 0, 0, 0.4)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 10,
-    letterSpacing: 1,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+    letterSpacing: 0.2,
+    lineHeight: 26,
   },
   headerSubtitle: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#b3e5fc',
-    textAlign: 'center',
-    fontWeight: '600',
-    letterSpacing: 0.8,
+    textAlign: 'left',
+    fontWeight: '500',
+    letterSpacing: 0.2,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
+    lineHeight: 18,
   },
   scrollView: {
     flex: 1,
@@ -1482,9 +1965,10 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   historyDisease: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '900',
     color: '#f3f4f6',
+    flexWrap: 'wrap',
   },
   historyMeta: {
     fontSize: 13,
@@ -2239,12 +2723,13 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     flex: 1,
-    fontSize: 17,
+    fontSize: 16,
     color: '#333',
-    lineHeight: 26,
-    fontWeight: '600',
-    paddingTop: 8,
+    lineHeight: 25,
+    fontWeight: '500',
+    paddingTop: 6,
     letterSpacing: 0.2,
+    flexWrap: 'wrap',
   },
   tipBox: {
     backgroundColor: '#e3f2fd',
@@ -2261,11 +2746,12 @@ const styles = StyleSheet.create({
   },
   tipText: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 14,
     color: '#1976d2',
-    lineHeight: 22,
-    fontWeight: '600',
+    lineHeight: 21,
+    fontWeight: '500',
     letterSpacing: 0.2,
+    flexWrap: 'wrap',
   },
   supplyRow: {
     flexDirection: 'row',
@@ -2380,13 +2866,18 @@ const styles = StyleSheet.create({
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    gap: 12,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '900',
     color: '#333',
+    flex: 1,
+    flexWrap: 'wrap',
   },
   modalClose: {
     fontSize: 18,
@@ -2394,5 +2885,55 @@ const styles = StyleSheet.create({
     color: '#555',
     paddingHorizontal: 8,
     paddingVertical: 4,
+  },
+  languageModalContent: {
+    width: '85%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  languageOptionsContainer: {
+    padding: 20,
+    paddingTop: 10,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 18,
+    marginVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#f8f9fa',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  languageOptionActive: {
+    backgroundColor: '#e3f2fd',
+    borderColor: '#2196f3',
+  },
+  languageFlag: {
+    fontSize: 32,
+    marginRight: 16,
+  },
+  languageName: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+    flexWrap: 'wrap',
+  },
+  languageNameActive: {
+    color: '#1976d2',
+    fontWeight: '700',
+  },
+  languageCheck: {
+    fontSize: 24,
+    color: '#2196f3',
+    fontWeight: 'bold',
   },
 });

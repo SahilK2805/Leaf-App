@@ -74,3 +74,54 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Translation dictionaries for disease detection results
+DISEASE_TRANSLATIONS = {
+    'mr': {  # Marathi
+        'Healthy': 'निरोगी',
+        'Brown Spot': 'तपकिरी डाग',
+        'Leaf Blast': 'पानांचा धुका',
+        'Bacterial Leaf Blight': 'जिवाणु पान गंज',
+        'Hispa': 'हिस्पा',
+        'Unknown': 'अज्ञात',
+    },
+    'hi': {  # Hindi
+        'Healthy': 'स्वस्थ',
+        'Brown Spot': 'ब्राउन स्पॉट',
+        'Leaf Blast': 'पत्ती झुलसा',
+        'Bacterial Leaf Blight': 'बैक्टीरियल पत्ती झुलसा',
+        'Hispa': 'हिस्पा',
+        'Unknown': 'अज्ञात',
+    }
+}
+
+
+def translate_result(result: dict, language: str) -> dict:
+    """
+    Translate disease detection result to the specified language.
+    
+    Args:
+        result: The detection result dictionary
+        language: Target language code ('mr' for Marathi, 'hi' for Hindi)
+    
+    Returns:
+        Translated result dictionary
+    """
+    if language not in DISEASE_TRANSLATIONS:
+        return result
+    
+    translations = DISEASE_TRANSLATIONS[language]
+    translated_result = result.copy()
+    
+    # Translate disease name
+    if 'disease_name' in translated_result and translated_result['disease_name']:
+        disease_name = translated_result['disease_name']
+        translated_result['disease_name'] = translations.get(disease_name, disease_name)
+    
+    # Translate diagnosis in analysis
+    if 'analysis' in translated_result and 'diagnosis' in translated_result['analysis']:
+        diagnosis = translated_result['analysis']['diagnosis']
+        translated_result['analysis']['diagnosis'] = translations.get(diagnosis, diagnosis)
+    
+    return translated_result

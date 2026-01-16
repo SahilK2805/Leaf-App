@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Request, HTTPException, UploadFile, File
+from fastapi import FastAPI, Request, HTTPException, UploadFile, File, Form
 from fastapi.responses import JSONResponse
+from typing import Optional
 import logging
 import os
 import numpy as np
-from utils import convert_image_to_base64_and_test, test_with_base64_data
+from utils import convert_image_to_base64_and_test, test_with_base64_data, translate_result
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,13 +13,16 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Leaf Disease Detection API", version="1.0.0")
 
 @app.post('/disease-detection-file')
-async def disease_detection_file(file: UploadFile = File(...)):
+async def disease_detection_file(
+    file: UploadFile = File(...),
+    language: Optional[str] = Form('en')
+):
     """
     Endpoint to detect diseases in leaf images using direct image file upload.
-    Accepts multipart/form-data with an image file.
+    Accepts multipart/form-data with an image file and optional language parameter.
     """
     try:
-        logger.info("Received image file for disease detection")
+        logger.info(f"Received image file for disease detection (language: {language})")
         
         # Read uploaded file into memory
         contents = await file.read()
@@ -55,6 +59,11 @@ async def disease_detection_file(file: UploadFile = File(...)):
         
         # Convert the result
         result = convert_numpy_types(result)
+        
+        # Translate the result to the requested language
+        if language and language != 'en':
+            result = translate_result(result, language)
+            logger.info(f"Result translated to {language}")
         
         # Debug: Log if feature_analysis is present
         if "feature_analysis" in result:
